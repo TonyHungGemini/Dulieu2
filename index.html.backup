@@ -305,168 +305,47 @@ function saveToStorage(){try{localStorage.setItem('dashboardState',JSON.stringif
 
 function csvLine(line){const r=[],c='';let q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c.trim());c='';}else{c+=ch;}}r.push(c.trim());return r;}
 function getKV(s){const m=String(s).match(/KV(\d+)/i);return m?'KV'+m[1]:'';}
-function parseCSV(txt,pl){const ws=[];const ls=txt.split('\n');for(const l of ls){if(!l.trim())continue;const cs=csvLine(l);const stt=parseFloat(cs[0]);if(!stt||isNaN(stt)||stt<=0||stt>1000)continue;const maTo=cs[1]||'',maCN=cs[2]||'';const kv=gelet fetchErrors={a:'',b:'',c:'',d:''};
+function parseCSV(txt,pl){const ws=[];const ls=txt.split('\n');for(const l of ls){if(!l.trim())continue;const cs=csvLine(l);const stt=parseFloat(cs[0]);if(!stt||isNaN(stt)||stt<=0||stt>1000)continue;const maTo=cs[1]||'',maCN=cs[2]||'';const kv=getKV(maTo)||getKV(maCN);if(!kv)continue;let sl=0,nhat=0;const s100=parseFloat(cs[100]),n100=parseFloat(cs[102]);if(s100>0&&!isNaN(s100)){sl=s100;nhat=isNaN(n100)?0:n100;}else{for(let j=8;j<Math.min(cs.length-2,101);j+=3){const ds=parseFloat(cs[j]),dn=parseFloat(cs[j+1]);if(ds>0&&!isNaN(ds)){sl+=ds;if(!isNaN(dn))nhat+=dn;}}}const nsbq=nhat>0?sl/nhat:0;ws.push({maTo,maCN,kv,sl,nhat,nsbq,phien:pl.toUpperCase()});}return ws;}
 
-// Enhanced fetch with multiple proxy methods
-async function fetchCSV_Direct(url, phien) {
-  console.log('Trying direct fetch for', phien, url);
-  try {
-    const r = await fetch(url, {method: 'GET'});
-    if (r.ok) {
-      const t = await r.text();
-      if (t && t.trim().length > 10) {
-        fetchErrors[phien] = '';
-        console.log('✅ Direct fetch OK for', phien);
-        return t;
-      }
+let fetchErrors={a:'',b:'',c:'',d:''};
+// Try direct fetch first - works for published CSV URLs
+async function fetchCSV_Direct(url,phien){
+  console.log('Trying direct fetch for',phien,url);
+  try{
+    // Try with no-cors first (might work for Google Sheets)
+    const r1=await fetch(url,{method:'GET',mode:'no-cors'});
+    if(r1.ok || r1.type==='opaque'){
+      const t=await r1.text();
+      console.log('no-cors response:',t.substring(0,200));
+      if(t&&t.trim().length>10){fetchErrors[phien]='';return t;}
     }
-  } catch (e) {
-    console.log('Direct fetch error:', e.message);
-  }
+  }catch(e){console.log('Direct fetch error:',e);}
+  // Try regular cors
+  try{
+    const r=await fetch(url);
+    if(r.ok){const t=await r.text();if(t&&t.trim().length>10){fetchErrors[phien]='';console.log('CORS fetch OK for',phien);return t;}}
+  }catch(e){console.log('CORS fetch failed:',e);}
   return null;
 }
-
-async function fetchCSV_WithProxies(url, phien) {
-  const proxies = [
-    u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
-    u => 'https://cors-anywhere.herokuapp.com/' + u,
-    u => 'https://thingproxy.freeboard.io/fetch/' + u
-  ];
-
-  for (let i = 0; i < proxies.length; i++) {
-    try {
-      const proxyUrl = proxies[i](url);
-      console.log(`Trying proxy ${i+1}/${proxies.length} for ${phien}`);
-      const r = await fetch(proxyUrl, {timeout: 8000});
-      if (r.ok) {
-        const t = await r.text();
-        if (t && t.trim().length > 10) {
-          fetchErrors[phien] = '';
-          console.log(`✅ Proxy ${i+1} OK for ${phien}`);
-          return t;
-        }
-      }
-    } catch (e) {
-      console.log(`Proxy ${i+1} failed:`, e.message);
-    }
-  }
+async function fetchCSV(url,phien){
+  if(!url||!url.trim())return null;
+  console.log('fetchCSV called for',phien,url);
+  // Method 1: Try direct fetch (works for published CSV URLs)
+  const data=await fetchCSV_Direct(url,phien);
+  if(data)return data;
+  // Method 2: Try through allorigins proxy
+  try{
+    const proxyUrl='https://api.allorigins.win/raw?url='+encodeURIComponent(url);
+    const r=await fetch(proxyUrl);
+    if(r.ok){const t=await r.text();if(t&&t.trim().length>10){fetchErrors[phien]='';return t;}}
+  }catch(e){console.log('Proxy failed',e);}
+  fetchErrors[phien]='All methods failed';
   return null;
 }
+async function loadSession(session,url,target){const txt=await fetchCSV(url,session);if(txt){target[session]=parseCSV(txt,session);return true;}return false;}
 
-async function fetchCSV(url, phien) {
-  if (!url || !url.trim()) {
-    fetchErrors[phien] = 'URL trống';
-    return null;
-  }
-
-  console.log('=== fetchCSV for', phien, '===');
-  console.log('URL:', url);
-
-  let data = await fetchCSV_Direct(url, phien);
-  if (data) return data;
-
-  data = await fetchCSV_WithProxies(url, phien);
-  if (data) return data;
-
-  const msg = 'Không thể tải từ Google Sheets. Vui lòng kiểm tra:\n1. URL đúng?\n2. Sheet đã "Publish to web" chưa?\n3. Chọn format CSV?';
-  fetchErrors[phien] = msg;
-  console.error('❌ All fetch methods failed for', phien);
-  return null;
-}
-
-async function loadSession(session, url, target) {
-  const txt = await fetchCSV(url, session);
-  if (txt) {
-    target[session] = parseCSV(txt, session);
-    console.log('✅ Loaded', target[session].length, 'records for', session);
-    return true;
-  }
-  console.error('❌ Failed to load session', session);
-  return false;
-}
-
-async function testConnection(session) {
-  const url = document.getElementById('u' + session).value.trim();
-  if (!url) {
-    alert('❌ Vui lòng nhập URL');
-    return;
-  }
-  
-  showLoading(true);
-  console.log('Testing connection for', session);
-  const txt = await fetchCSV(url, session);
-  showLoading(false);
-  
-  if (txt) {
-    try {
-      const d = parseCSV(txt, session);
-      alert('✅ Thành công!\n' + d.length + ' records được tải');
-    } catch (e) {
-      alert('⚠️ Tải được file nhưng lỗi parse CSV:\n' + e.message);
-    }
-  } else {
-    alert('❌ Không tải được:\n' + (fetchErrors[session] || 'Lỗi không xác định'));
-  }
-}
-
-async function testAllConnections() {
-  showLoading(true);
-  let c = 0;
-  for (const p of PHIENS) {
-    const url = document.getElementById('u' + p).value.trim();
-    if (url) {
-      state.liveURLs[p] = url;
-      localStorage.setItem('url_' + p, url);
-      if (await loadSession(p, url, state.liveData)) c++;
-    }
-  }
-  showLoading(false);
-  
-  if (c > 0) {
-    updateBadges();
-    renderAll();
-    saveToStorage();
-    closeSetup();
-    alert('✅ Kết nối ' + c + '/4 phiên thành công!');
-  } else {
-    alert('❌ Không kết nối được phiên nào.\nVui lòng kiểm tra URL và thử lại.');
-  }
-  return c;
-}
-
-async function refreshAll() {
-  showLoading(true);
-  let c = 0;
-  let errMsg = '';
-  
-  for (const p of PHIENS) {
-    if (state.liveURLs[p]) {
-      if (await loadSession(p, state.liveURLs[p], state.liveData)) {
-        c++;
-      }
-      if (fetchErrors[p]) {
-        errMsg += PC[p].label + ':\n' + fetchErrors[p] + '\n\n';
-      }
-    }
-  }
-  
-  showLoading(false);
-  
-  if (c > 0 || state.currentMode === 'history') {
-    updateBadges();
-    renderAll();
-  }
-  
-  if (errMsg) {
-    console.error('Fetch errors:', errMsg);
-    setStatus('err', 'Lỗi tải ' + Object.keys(fetchErrors).filter(k => fetchErrors[k]).length + ' phiên');
-  } else if (c > 0) {
-    setStatus('ok', c + '/4 phiên kết nối ✅');
-  }
-  
-  return c;
-}
-dateBadges();renderAll();saveToStorage();closeSetup();}return c;}
+async function testConnection(session){const url=document.getElementById('u'+session).value.trim();if(!url)return;showLoading(true);const txt=await fetchCSV(url);showLoading(false);if(txt){const d=parseCSV(txt,session);alert('✅ '+d.length+' records');}else{alert('❌ Không tải được.');}}
+async function testAllConnections(){showLoading(true);let c=0;for(const p of PHIENS){const url=document.getElementById('u'+p).value.trim();if(url){state.liveURLs[p]=url;localStorage.setItem('url_'+p,url);if(await loadSession(p,url,state.liveData))c++;}}showLoading(false);if(c>0){updateBadges();renderAll();saveToStorage();closeSetup();}return c;}
 async function refreshAll(){showLoading(true);let c=0;let errMsg='';for(const p of PHIENS){if(state.liveURLs[p]){if(await loadSession(p,state.liveURLs[p],state.liveData))c++;if(fetchErrors[p])errMsg+=PC[p].label+': '+fetchErrors[p]+'\n';}}showLoading(false);if(c>0||state.currentMode==='history'){updateBadges();renderAll();}if(errMsg){setStatus('err',errMsg);}return c;}
 
 function getMonthName(key){const [y,m]=key.split('-');const months=['Giêng','Hai','Ba','Tư','Năm','Sáu','Bảy','Tám','Chín','Mười','Mười Một','Mười Hai'];return'Tháng '+months[parseInt(m)-1]+' '+y;}
