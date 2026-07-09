@@ -2,7 +2,7 @@
 
 Dashboard khai thác mủ cao su – Đội Sản Xuất 02 | PWA 4 phiên A/B/C/D
 
-**Live:** https://tonyhunggemini.github.io/crck2-farm2/
+**Live:** https://tonyhunggemini.github.io/crck2-farm2-dashboard/
 
 ---
 
