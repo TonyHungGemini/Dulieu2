@@ -4,79 +4,67 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🌿 CRCK2 Aphivath – Farm 2 Dashboard</title>
-
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json?v=3">
 <meta name="theme-color" content="#2d6a4f">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CRCK2 Farm2">
-
-<!-- Icons -->
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
 <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
-
-<!-- SEO -->
 <meta name="description" content="Dashboard khai thác mủ cao su – Đội 2 CRCK2 Aphivath. 4 phiên A/B/C/D, 322 công nhân, 8 khu vực.">
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{
-  --bg:#f4f6f8;--surface:#fff;--border:#e2e8f0;
-  --text:#1a202c;--muted:#718096;--sec:#4a5568;
-  --green:#2f855a;--gl:#c6f6d5;--gm:#48bb78;
-  --red:#c53030;--rl:#fed7d7;
-  --orange:#c05621;--ol:#feebc8;
-  --blue:#2b6cb0;--bl:#bee3f8;
-  --purple:#553c9a;--pl:#e9d8fd;
-  --A:#3b82f6;--B:#10b981;--C:#f59e0b;--D:#8b5cf6;
-  --Al:rgba(59,130,246,.75);--Bl:rgba(16,185,129,.75);
-  --Cl:rgba(245,158,11,.75);--Dl:rgba(139,92,246,.75);
-  --r:10px;--sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
-}
+:root{--bg:#f4f6f8;--surface:#fff;--border:#e2e8f0;--text:#1a202c;--muted:#718096;--sec:#4a5568;--green:#2f855a;--gl:#c6f6d5;--gm:#48bb78;--red:#c53030;--rl:#fed7d7;--orange:#c05621;--ol:#feebc8;--blue:#2b6cb0;--bl:#bee3f8;--purple:#553c9a;--pl:#e9d8fd;--A:#3b82f6;--B:#10b981;--C:#f59e0b;--D:#8b5cf6;--Al:rgba(59,130,246,.75);--Bl:rgba(16,185,129,.75);--Cl:rgba(245,158,11,.75);--Dl:rgba(139,92,246,.75);--r:10px;--sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;}
-
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--surface);border-radius:12px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.modal-hdr{background:linear-gradient(135deg,#1a365d,#2b6cb0);color:#fff;padding:16px 20px;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.modal-hdr.gold{background:linear-gradient(135deg,#744210,#d97706);}
+.modal-hdr h2{font-size:16px;font-weight:700;}
+.modal-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;}
+.modal-body{padding:20px;}
+.modal-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;}
+.btn-primary{background:#2f855a;color:#fff;}
+.btn-secondary{background:#e2e8f0;color:var(--text);}
+.btn-sm2{padding:4px 8px;font-size:11px;border-radius:6px;}
 /* SETUP */
 #setup{background:linear-gradient(135deg,#1a365d,#2b6cb0);color:#fff;overflow:hidden;max-height:600px;transition:max-height .4s ease;}
 #setup.gone{max-height:0;}
 .si{padding:18px 26px;}
-.st{font-size:15px;font-weight:700;margin-bottom:10px;}
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0;}
-.step{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:11px;}
-.sn{font-size:22px;font-weight:900;opacity:.4;margin-bottom:3px;}
-.st2{font-size:11.5px;line-height:1.5;opacity:.88;}
 .phien-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
 .phien-row{background:rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;}
 .phien-label{font-size:11px;font-weight:700;margin-bottom:6px;letter-spacing:.5px;}
 .url-in{width:100%;padding:7px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;font-size:12px;outline:none;}
-.url-in::placeholder{color:rgba(255,255,255,.4);}
-.btn{padding:6px 14px;border-radius:7px;border:none;font-size:12px;font-weight:600;cursor:pointer;margin-top:6px;}
 .btn-connect{color:#fff;width:100%;}
 .btn-ghost{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);}
-.btn-ghost:hover{background:rgba(255,255,255,.25);}
 .btn-all{background:#38a169;color:#fff;margin-top:10px;padding:8px 20px;}
 .hint{font-size:11px;opacity:.65;margin-top:8px;}
-
 /* HEADER */
-.hdr{background:linear-gradient(135deg,#1a4731,#2d6a4f 50%,#40916c);color:#fff;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.hdr{background:linear-gradient(135deg,#1a4731,#2d6a4f 50%,#40916c);color:#fff;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.15);flex-wrap:wrap;gap:10px;}
 .hdr h1{font-size:16px;font-weight:700;}
 .hdr p{font-size:11px;opacity:.8;margin-top:1px;}
-.hdr-r{display:flex;gap:10px;align-items:center;}
+.hdr-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+/* CURRENT MONTH LABEL */
+#currentMonthLabel{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;}
+#currentMonthLabel.live{background:rgba(72,187,120,.3);border-color:#48bb78;}
+#currentMonthLabel.hist{background:rgba(245,158,11,.3);border-color:#f59e0b;}
+/* STATUS */
 .status{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:7px;padding:4px 11px;font-size:11px;}
 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .dok{background:#68d391;box-shadow:0 0 0 3px rgba(104,211,145,.3);}
 .dwarn{background:#f6ad55;}.derr{background:#fc8181;}
 .dload{background:#63b3ed;animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.bdg{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);border-radius:7px;padding:4px 11px;text-align:center;}
-.bdg .v{font-size:16px;font-weight:700;}.bdg .l{font-size:10px;opacity:.8;}
-.btn-r{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:6px;padding:4px 11px;font-size:11.5px;font-weight:600;cursor:pointer;}
-
-/* PHIÊN BADGES in header */
+.btn-r{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:600;cursor:pointer;}
+/* PHIÊN BADGES */
 .phien-badges{display:flex;gap:5px;}
 .pb{padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;opacity:.5;}
 .pb.connected{opacity:1;}
@@ -84,21 +72,18 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .pb2{background:rgba(16,185,129,.3);color:#a7f3d0;}
 .pc{background:rgba(245,158,11,.3);color:#fde68a;}
 .pd2{background:rgba(139,92,246,.3);color:#ddd6fe;}
-
+/* HISTORY BUTTON */
+.btn-history{background:linear-gradient(135deg,#d97706,#f59e0b);border:none;color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;}
 /* LAYOUT */
 .wrap{max-width:1400px;margin:0 auto;padding:14px 20px;}
-.sec{font-size:11px;font-weight:700;color:var(--sec);letter-spacing:.8px;text-transform:uppercase;margin:18px 0 9px;padding-left:9px;border-left:3px solid #3182ce;}
-.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 .g2{display:grid;grid-template-columns:3fr 2fr;gap:12px;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 .geq{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .card{background:var(--surface);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);border:1px solid var(--border);}
 .ct{font-size:12.5px;font-weight:700;margin-bottom:10px;}
-.ct span{font-weight:400;color:var(--muted);font-size:11px;margin-left:5px;}
 .cw{position:relative;height:200px;}
 canvas{display:block;}
-
 /* KPI */
 .kpi{background:var(--surface);border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh);border:1px solid var(--border);position:relative;overflow:hidden;}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
@@ -106,740 +91,308 @@ canvas{display:block;}
 .kpi.o::before{background:#ed8936;}.kpi.r::before{background:#e53e3e;}
 .kpi.p::before{background:#805ad5;}
 .kl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
-.kv{font-size:21px;font-weight:800;margin:3px 0 2px;letter-spacing:-.5px;}
+.kv{font-size:21px;font-weight:800;margin:3px 0 2px;}
 .ks{font-size:11px;color:var(--muted);}
 .pbar{height:4px;border-radius:2px;background:#e2e8f0;overflow:hidden;margin-top:5px;}
 .pfill{height:100%;border-radius:2px;}
-
 /* PILL */
 .pill{display:inline-block;padding:1px 7px;border-radius:9px;font-size:11px;font-weight:700;}
 .pr{background:var(--rl);color:var(--red);}.po{background:var(--ol);color:var(--orange);}
 .py{background:#fefcbf;color:#744210;}.pg{background:var(--gl);color:var(--green);}
-.pb3{background:var(--bl);color:var(--blue);}.pp{background:var(--pl);color:var(--purple);}
-
-/* PHIÊN STAT CARDS */
-.phien-stat{border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh);border:1px solid var(--border);}
+/* PHIÊN STAT */
+.phien-stat{border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh);border:1px solid var(--border);transition:opacity .3s;}
+.phien-stat.disconnected{opacity:.5;}
 .ps-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.ps-badge{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0;}
+.ps-badge{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;}
 .ps-title{font-size:12px;font-weight:700;}
 .ps-sub{font-size:10px;color:var(--muted);}
 .ps-val{font-size:20px;font-weight:800;margin:3px 0;}
 .ps-detail{font-size:11px;color:var(--muted);}
-.ps-disconnected{opacity:.45;filter:grayscale(.8);}
-
 /* TABLE */
 .ts{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
 thead tr{background:#f7fafc;}
-th{padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;border-bottom:2px solid var(--border);white-space:nowrap;}
-td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--sec);white-space:nowrap;}
+th{padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;border-bottom:2px solid var(--border);}
+td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--sec);}
 tbody tr:hover{background:#f7fafc;}
-tbody tr:last-child td{border-bottom:none;}
-.tr2{text-align:right;font-weight:600;color:var(--text);}.tc{text-align:center;}
-th.tr2{text-align:right;}
-
+.tr2{text-align:right;font-weight:600;}
+.tc{text-align:center;}
 /* TABS */
-.tabs{display:flex;gap:3px;margin-bottom:10px;flex-wrap:wrap;}
-.tab{padding:3px 11px;border-radius:6px;border:1px solid var(--border);background:#f7fafc;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;}
-.tab.active{background:#3182ce;color:#fff;border-color:#3182ce;}
-.tp{display:none;}.tp.active{display:block;}
-
-/* ALERTS */
-.ag{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-.alert{border-radius:9px;padding:11px 13px;display:flex;gap:9px;}
-.ai{font-size:16px;flex-shrink:0;margin-top:1px;}
-.at{font-size:12px;font-weight:700;margin-bottom:2px;}
-.ad{font-size:11.5px;line-height:1.5;color:var(--sec);}
-.alr{background:var(--rl);border:1px solid #fc8181;}.alr .at{color:var(--red);}
-.alo{background:var(--ol);border:1px solid #f6ad55;}.alo .at{color:var(--orange);}
-.alb{background:var(--bl);border:1px solid #63b3ed;}.alb .at{color:var(--blue);}
-.alg{background:var(--gl);border:1px solid #68d391;}.alg .at{color:var(--green);}
-.alp{background:var(--pl);border:1px solid #b794f4;}.alp .at{color:var(--purple);}
-
+.tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap;}
+.tab{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:#e2e8f0;color:var(--muted);border:none;}
+.tab.active{background:var(--green);color:#fff;}
+/* HISTORY LIST */
+.history-list{display:flex;flex-direction:column;gap:8px;}
+.history-item{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--border);border-radius:10px;cursor:pointer;}
+.history-item:hover{border-color:var(--blue);background:#f0f7ff;}
+.history-item.active{border-color:var(--green);background:#f0fdf4;}
+.history-item .hi-month{font-size:14px;font-weight:700;}
+.history-item .hi-status{font-size:11px;margin-left:auto;}
+.history-item .hi-sessions{display:flex;gap:4px;margin-top:4px;}
+.history-item .hi-sessions .sb{padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;}
+/* SETTINGS */
+.settings-section{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.month-editor{border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+.month-editor h4{font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.month-sessions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
+.msession{display:flex;flex-direction:column;gap:4px;}
+.msession label{font-size:10px;font-weight:700;text-transform:uppercase;}
+.msession input{width:100%;font-size:11px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;}
+.settings-actions{display:flex;gap:6px;margin-top:8px;}
+/* ALERT */
+.alert{padding:12px 14px;border-radius:8px;margin-bottom:12px;font-size:13px;}
+.alert-info{background:#bee3f8;color:#2c5282;}
+.alert-success{background:#c6f6d5;color:#22543d;}
 /* LOADING */
-#ov{position:fixed;inset:0;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;gap:12px;transition:opacity .3s;}
-#ov.gone{opacity:0;pointer-events:none;}
-.spin{width:36px;height:36px;border:4px solid #e2e8f0;border-top-color:#3182ce;border-radius:50%;animation:sp .7s linear infinite;}
-@keyframes sp{to{transform:rotate(360deg)}}
-
-.footer{text-align:center;color:var(--muted);font-size:11px;padding:14px 0 22px;margin-top:18px;border-top:1px solid var(--border);}
-
-@media(max-width:900px){
-  .g5,.g2,.g3,.g4,.geq,.ag,.steps,.phien-grid,.phien-badges{grid-template-columns:1fr;}
-  .phien-badges{flex-wrap:wrap;}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.9);z-index:999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+.loading-overlay.show{display:flex;}
+.spinner{width:40px;height:40px;border:4px solid #e2e8f0;border-top-color:#2f855a;border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.timestamp{font-size:11px;color:var(--muted);margin-top:8px;}
+/* RESPONSIVE */
+@media(max-width:768px){
+.g4{grid-template-columns:repeat(2,1fr);}
+.g2,.g3,.geq{grid-template-columns:1fr;}
+.phien-grid{grid-template-columns:1fr;}
+.month-sessions{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
 <body>
+<div id="loadingOverlay" class="loading-overlay"><div class="spinner"></div><div style="font-size:14px;font-weight:600;color:var(--muted)">Đang tải dữ liệu...</div></div>
 
-<!-- LOADING -->
-<div id="ov"><div class="spin"></div><div style="color:var(--sec);font-size:13px" id="lmsg">Đang khởi động...</div></div>
-
-<!-- SETUP BANNER -->
-<div id="setup">
-  <div class="si">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div class="st">🔗 Kết Nối Google Sheet – 4 Phiên A / B / C / D</div>
-      <button class="btn btn-ghost" style="padding:4px 12px;font-size:11px" onclick="document.getElementById('setup').classList.add('gone')">✕ Đóng</button>
-    </div>
-    <div class="steps">
-      <div class="step"><div class="sn">①</div><div class="st2"><strong>Mở Google Sheet</strong> → File → Share → <strong>"Publish to web"</strong><br><em>(Không phải "Share link")</em></div></div>
-      <div class="step"><div class="sn">②</div><div class="st2">Chọn <strong>tab sheet cụ thể</strong> (VD: "Phiên A") → Định dạng: <strong>CSV</strong> → Nhấn <strong>Publish</strong></div></div>
-      <div class="step"><div class="sn">③</div><div class="st2">Copy URL được cấp. <strong>Lặp lại cho từng phiên</strong> B, C, D nếu chúng là sheet tab riêng biệt.</div></div>
-      <div class="step"><div class="sn">④</div><div class="st2">Dán URL vào ô tương ứng bên dưới → Nhấn <strong>Kết Nối</strong>. Dashboard tự nhớ, tự cập nhật mãi mãi.</div></div>
-    </div>
-    <div class="phien-grid">
-      <div class="phien-row" style="border-left:3px solid var(--A)">
-        <div class="phien-label" style="color:var(--A)">PHIÊN A</div>
-        <input class="url-in" id="ua" placeholder="https://...pub?gid=...&output=csv"/>
-        <button class="btn btn-connect" style="background:var(--A)" onclick="connectOne('a')">Kết Nối A</button>
-      </div>
-      <div class="phien-row" style="border-left:3px solid var(--B)">
-        <div class="phien-label" style="color:var(--B)">PHIÊN B</div>
-        <input class="url-in" id="ub" placeholder="https://...pub?gid=...&output=csv"/>
-        <button class="btn btn-connect" style="background:var(--B)" onclick="connectOne('b')">Kết Nối B</button>
-      </div>
-      <div class="phien-row" style="border-left:3px solid var(--C)">
-        <div class="phien-label" style="color:var(--C)">PHIÊN C</div>
-        <input class="url-in" id="uc" placeholder="https://...pub?gid=...&output=csv"/>
-        <button class="btn btn-connect" style="background:var(--C)" onclick="connectOne('c')">Kết Nối C</button>
-      </div>
-      <div class="phien-row" style="border-left:3px solid var(--D)">
-        <div class="phien-label" style="color:var(--D)">PHIÊN D</div>
-        <input class="url-in" id="ud" placeholder="https://...pub?gid=...&output=csv"/>
-        <button class="btn btn-connect" style="background:var(--D)" onclick="connectOne('d')">Kết Nối D</button>
-      </div>
-    </div>
-    <div style="display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap">
-      <button class="btn btn-all" onclick="connectAll()">🔄 Kết Nối Tất Cả 4 Phiên</button>
-      <span class="hint">Nếu tất cả 4 phiên nằm trong <strong>cùng 1 Google Sheet</strong>, bạn cần publish từng sheet tab riêng và có 4 URL khác nhau (gid khác nhau).</span>
-    </div>
-  </div>
+<!-- SETUP MODAL -->
+<div id="setup" class="modal-overlay">
+<div class="modal" style="background:transparent;box-shadow:none;">
+<div class="modal-hdr"><h2>🔗 Kết Nối Google Sheet</h2><button class="modal-close" onclick="closeSetup()">✕</button></div>
+<div style="background:#fff;border-radius:0 0 12px 12px;padding:20px;">
+<p style="margin-bottom:14px;font-size:13px;">① Mở Google Sheet → File → Share → "Publish to web"<br>② Chọn tab → CSV → Publish<br>③ Copy URL cho từng phiên.</p>
+<div class="phien-grid">
+<div class="phien-row"><div class="phien-label">PHIÊN A</div><input class="url-in" id="ua" placeholder="https://docs.google.com/...csv"><button class="btn btn-connect btn-ghost" onclick="testConnection('a')">Test</button></div>
+<div class="phien-row"><div class="phien-label">PHIÊN B</div><input class="url-in" id="ub" placeholder="https://docs.google.com/...csv"><button class="btn btn-connect btn-ghost" onclick="testConnection('b')">Test</button></div>
+<div class="phien-row"><div class="phien-label">PHIÊN C</div><input class="url-in" id="uc" placeholder="https://docs.google.com/...csv"><button class="btn btn-connect btn-ghost" onclick="testConnection('c')">Test</button></div>
+<div class="phien-row"><div class="phien-label">PHIÊN D</div><input class="url-in" id="ud" placeholder="https://docs.google.com/...csv"><button class="btn btn-connect btn-ghost" onclick="testConnection('d')">Test</button></div>
 </div>
+<button class="btn btn-all" onclick="testAllConnections()">🔄 Kết Nối Tất Cả</button>
+</div></div></div>
+
+<!-- HISTORY MODAL -->
+<div id="historyModal" class="modal-overlay">
+<div class="modal">
+<div class="modal-hdr"><h2>📅 Lịch Sử Dữ Liệu</h2><button class="modal-close" onclick="closeModal('historyModal')">✕</button></div>
+<div class="modal-body"><div id="historyList" class="history-list"></div></div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="closeModal('historyModal')">Đóng</button>
+<button class="btn btn-primary" onclick="openModal('settingsModal')">⚙️ Cài Đặt</button>
+</div></div></div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal-overlay">
+<div class="modal">
+<div class="modal-hdr gold"><h2>⚙️ Cài Đặt Nguồn Dữ Liệu</h2><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
+<div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+<div class="settings-section">
+<h3 style="font-size:14px;font-weight:700;margin-bottom:12px;">📊 Cấu Hình Tháng</h3>
+<div id="monthConfigs"></div>
+<button class="btn btn-primary" onclick="addNewMonth()" style="margin-top:10px;">➕ Thêm Tháng Mới</button>
+</div>
+<div class="settings-section">
+<div class="alert alert-info">1. Google Sheet → File → Share → "Publish to web"<br>2. Chọn tab → CSV → Publish<br>3. Dán URL → Lưu</div>
+</div></div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="closeModal('settingsModal')">Đóng</button>
+<button class="btn btn-primary" onclick="saveAllMonths()">💾 Lưu Tất Cả</button>
+</div></div></div>
 
 <!-- HEADER -->
-<div class="hdr">
-  <div style="display:flex;align-items:center;gap:12px">
-    <img src="icons/icon-72x72.png" alt="CRCK2" style="width:40px;height:40px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.3)">
-    <div>
-      <h1>CRCK2 Aphivath – Đội 2 | Dashboard Khai Thác Mủ</h1>
-      <p id="hsub">Dữ liệu T6/2026 · 4 Phiên A/B/C/D · Tự cập nhật mỗi 5 phút</p>
-    </div>
-  </div>
-  <div class="hdr-r">
-    <div class="phien-badges">
-      <span class="pb pa" id="badge-a">A</span>
-      <span class="pb pb2" id="badge-b">B</span>
-      <span class="pb pc" id="badge-c">C</span>
-      <span class="pb pd2" id="badge-d">D</span>
-    </div>
-    <div class="status"><div class="dot dwarn" id="dot"></div><span id="stxt">Chưa kết nối</span></div>
-    <button class="btn-r" onclick="refreshAll()">↺ Cập nhật</button>
-    <div class="bdg"><div class="v" id="hsl">323,020</div><div class="l">kg Tổng SL</div></div>
-    <div class="bdg"><div class="v" id="hnsbq">96.9</div><div class="l">NSBQ TB</div></div>
-  </div>
+<header class="hdr">
+<div>
+<h1>🌿 CRCK2 Aphivath – Farm 2 Dashboard</h1>
+<p>4 Phiên A/B/C/D · Tự cập nhật mỗi 5 phút</p>
 </div>
+<div class="hdr-r">
+<div id="currentMonthLabel" class="live">📍 Live: Tháng Hiện Tại</div>
+<div id="connStatus" class="status"><span class="dot dload"></span><span id="stxt">Đang khởi động...</span></div>
+<div id="phienBadges" class="phien-badges">
+<span class="pb pa" id="badge-a">A</span>
+<span class="pb pb2" id="badge-b">B</span>
+<span class="pb pc" id="badge-c">C</span>
+<span class="pb pd2" id="badge-d">D</span>
+</div>
+<button class="btn-r" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);" onclick="openModal('settingsModal')">⚙️ Cài Đặt</button>
+<button class="btn-history" onclick="openModal('historyModal')">📅 Lịch Sử</button>
+<button class="btn-r" onclick="openModal('setup')">🔗 Kết Nối</button>
+<button class="btn-r" onclick="refreshAll()">🔄 Cập Nhật</button>
+</div>
+</header>
 
+<!-- MAIN CONTENT -->
 <div class="wrap">
-
-<!-- KPI ROW -->
-<div class="sec">Tổng Quan – Toàn Tháng (Tất Cả Phiên)</div>
-<div class="g5">
-  <div class="kpi g"><div class="kl">Tổng Sản Lượng</div>
-    <div class="kv" id="k-sl">323,020 <small style="font-size:12px;font-weight:500">kg</small></div>
-    <div class="ks" id="k-sl-s">Phiên A: 169,047 · D: 153,973</div>
-    <div class="pbar"><div class="pfill" id="k-sl-b" style="width:8.5%;background:#48bb78"></div></div>
-    <div style="font-size:10px;color:var(--muted);margin-top:3px" id="k-pct">KH 3,790,000 kg — đạt 8.5%</div>
-  </div>
-  <div class="kpi b"><div class="kl">NSBQ Bình Quân</div>
-    <div class="kv" id="k-nsbq">96.9 <small style="font-size:12px;font-weight:500">kg/nhát</small></div>
-    <div class="ks" id="k-nsbq-s">KV4 tốt nhất · KV8 thấp nhất</div>
-    <div class="pbar"><div class="pfill" id="k-nsbq-b" style="width:77%;background:#3182ce"></div></div>
-    <div style="font-size:10px;color:var(--muted);margin-top:3px">Mục tiêu ≥ 125 kg/nhát</div>
-  </div>
-  <div class="kpi o"><div class="kl">Tổng Nhát Cạo</div>
-    <div class="kv" id="k-nhat">3,326 <small style="font-size:12px;font-weight:500">nhát</small></div>
-    <div class="ks" id="k-nhat-s">A+D · Cạo 3–4h sáng ✅</div>
-  </div>
-  <div class="kpi r"><div class="kl">Công Nhân Mới</div>
-    <div class="kv">~50%</div>
-    <div class="ks">≈161/322 người</div>
-    <div style="margin-top:5px"><span class="pill pr">⚠ Lỗi KT cao</span></div>
-  </div>
-  <div class="kpi p"><div class="kl">Phiên Đã Kết Nối</div>
-    <div class="kv" id="k-conn">0/4 <small style="font-size:12px;font-weight:500">phiên</small></div>
-    <div class="ks" id="k-conn-s">Kết nối Sheet để xem live</div>
-  </div>
+<div class="tabs">
+<button class="tab active" onclick="switchView('all')">Tất Cả</button>
+<button class="tab" onclick="switchView('a')">Phiên A</button>
+<button class="tab" onclick="switchView('b')">Phiên B</button>
+<button class="tab" onclick="switchView('c')">Phiên C</button>
+<button class="tab" onclick="switchView('d')">Phiên D</button>
 </div>
 
-<!-- 4 PHIÊN STAT CARDS -->
-<div class="sec">Kết Quả Từng Phiên</div>
-<div class="g4" id="phien-stats">
-  <!-- rendered by JS -->
+<div class="g4" style="margin-bottom:16px;">
+<div class="kpi g"><div class="kl">Tổng Sản Lượng</div><div class="kv" id="k-sl">—</div><div class="ks" id="k-sl-s">Chưa có dữ liệu</div><div class="pbar"><div class="pfill" id="k-sl-b" style="background:#48bb78;width:0%"></div></div></div>
+<div class="kpi b"><div class="kl">NSBQ Bình Quân</div><div class="kv" id="k-nsbq">—</div><div class="ks">kg/nhát</div><div class="pbar"><div class="pfill" id="k-nsbq-b" style="background:#3182ce;width:0%"></div></div></div>
+<div class="kpi o"><div class="kl">Tổng Nhát Cạo</div><div class="kv" id="k-nhat">—</div><div class="ks">nhát</div></div>
+<div class="kpi p"><div class="kl">Kết Nối</div><div class="kv" id="k-conn">—</div><div class="ks" id="k-conn-s">phiên</div></div>
 </div>
 
-<!-- CHARTS ROW 1 -->
-<div class="sec">NSBQ Theo Khu Vực – So Sánh Tất Cả Phiên</div>
-<div class="g2">
-  <div class="card">
-    <div class="ct">NSBQ Bình Quân Theo KV <span>kg/nhát · 4 phiên A/B/C/D</span></div>
-    <div class="cw"><canvas id="cNSBQ"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="ct">Sản Lượng Theo KV <span>kg · tổng tất cả phiên</span></div>
-    <div class="cw"><canvas id="cSL"></canvas></div>
-  </div>
-</div>
+<div class="g4" id="phien-stats" style="margin-bottom:16px;"></div>
 
-<div class="g3" style="margin-top:12px">
-  <div class="card">
-    <div class="ct">Phân Bố NSBQ <span>toàn phần cạo</span></div>
-    <div class="cw"><canvas id="cDist"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="ct">Xu Hướng NSBQ Theo KV <span>đường line 4 phiên</span></div>
-    <div class="cw"><canvas id="cLine"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="ct">Khoảng Cách Tay Nghề <span>NSBQ min–max theo KV</span></div>
-    <div class="cw"><canvas id="cGap"></canvas></div>
-  </div>
-</div>
-
-<!-- KV TABLE -->
-<div class="sec">Chi Tiết Từng Khu Vực</div>
-<div class="card">
-  <div class="tabs" id="kv-tabs">
-    <button class="tab active" onclick="showTab('all',this)">Tất Cả Phiên</button>
-    <button class="tab" onclick="showTab('a',this)">Phiên A</button>
-    <button class="tab" onclick="showTab('b',this)">Phiên B</button>
-    <button class="tab" onclick="showTab('c',this)">Phiên C</button>
-    <button class="tab" onclick="showTab('d',this)">Phiên D</button>
-  </div>
-  <div class="tp active" id="tab-all"><div class="ts"><table>
-    <thead><tr><th>KV</th><th>CN</th><th class="tr2">SL Tổng (kg)</th><th class="tr2">Nhát</th><th class="tr2">NSBQ TB</th><th class="tr2">Min</th><th class="tr2">Max</th><th class="tc">Xếp Loại</th><th>Vườn Cây</th></tr></thead>
-    <tbody id="tb-all"></tbody>
-  </table></div></div>
-  <div class="tp" id="tab-a"><div class="ts"><table>
-    <thead><tr><th>KV</th><th class="tr2">SL (kg)</th><th class="tr2">Nhát</th><th class="tr2">NSBQ</th><th class="tc">Xếp Loại</th><th class="tr2">vs TB</th></tr></thead>
-    <tbody id="tb-a"></tbody>
-  </table></div></div>
-  <div class="tp" id="tab-b"><div class="ts"><table>
-    <thead><tr><th>KV</th><th class="tr2">SL (kg)</th><th class="tr2">Nhát</th><th class="tr2">NSBQ</th><th class="tc">Xếp Loại</th><th class="tr2">vs TB</th></tr></thead>
-    <tbody id="tb-b"></tbody>
-  </table></div></div>
-  <div class="tp" id="tab-c"><div class="ts"><table>
-    <thead><tr><th>KV</th><th class="tr2">SL (kg)</th><th class="tr2">Nhát</th><th class="tr2">NSBQ</th><th class="tc">Xếp Loại</th><th class="tr2">vs TB</th></tr></thead>
-    <tbody id="tb-c"></tbody>
-  </table></div></div>
-  <div class="tp" id="tab-d"><div class="ts"><table>
-    <thead><tr><th>KV</th><th class="tr2">SL (kg)</th><th class="tr2">Nhát</th><th class="tr2">NSBQ</th><th class="tc">Xếp Loại</th><th class="tr2">vs TB</th></tr></thead>
-    <tbody id="tb-d"></tbody>
-  </table></div></div>
-</div>
-
-<!-- TOP / BOTTOM -->
-<div class="sec">Công Nhân Nổi Bật (Toàn Tháng)</div>
 <div class="geq">
-  <div class="card">
-    <div class="ct">🏆 Top 10 – NSBQ Cao Nhất</div>
-    <div class="ts"><table><thead><tr><th>#</th><th>Mã CN</th><th>KV</th><th class="tc">Phiên</th><th class="tr2">SL (kg)</th><th class="tr2">NSBQ</th></tr></thead><tbody id="tb-top"></tbody></table></div>
-  </div>
-  <div class="card">
-    <div class="ct">📉 Bottom 10 – NSBQ Thấp Nhất <span>ưu tiên kèm cặp</span></div>
-    <div class="ts"><table><thead><tr><th>#</th><th>Mã CN</th><th>KV</th><th class="tc">Phiên</th><th class="tr2">SL (kg)</th><th class="tr2">NSBQ</th></tr></thead><tbody id="tb-bot"></tbody></table></div>
-  </div>
+<div class="card"><div class="ct">NSBQ Theo KV – So Sánh Phiên</div><div class="cw"><canvas id="cNSBQ"></canvas></div></div>
+<div class="card"><div class="ct">Sản Lượng Theo KV</div><div class="cw"><canvas id="cSL"></canvas></div></div>
+</div>
+<div class="g3" style="margin-top:12px;">
+<div class="card"><div class="ct">Phân Bố NSBQ</div><div class="cw"><canvas id="cDist"></canvas></div></div>
+<div class="card"><div class="ct">Xu Hướng NSBQ Theo KV</div><div class="cw"><canvas id="cLine"></canvas></div></div>
+<div class="card"><div class="ct">Khoảng Cách Tay Nghề</div><div class="cw"><canvas id="cGap"></canvas></div></div>
 </div>
 
-<!-- ALERTS -->
-<div class="sec">Cảnh Báo & Khuyến Nghị Tháng 7</div>
-<div class="ag">
-  <div class="alert alr"><div class="ai">🚨</div><div><div class="at">[P1] Brown Bast – Cây Phạm Gỗ KV1–4</div><div class="ad">Kiểm tra thực địa phát hiện vết đen/nâu trên miệng cạo. Dừng cạo cây bệnh ngay, cho nghỉ 4–8 tuần, bôi thuốc phục hồi vỏ.</div></div></div>
-  <div class="alert alr"><div class="ai">👷</div><div><div class="at">[P2] 50% CN Mới = Gốc Rễ 4 Lỗi Kỹ Thuật</div><div class="ad">Cạo phạm gỗ · Mủ đông miệng · Máng lệch · Không vệ sinh. Ghép đôi CN giỏi–mới, huấn luyện 30 phút/sáng tuần đầu T7.</div></div></div>
-  <div class="alert alo"><div class="ai">⚗️</div><div><div class="at">[P3] KT Quá Dày – Cây Non KV7/8</div><div class="ad">1 lần/tháng tối đa, Ethephon 2.5% cho cây 6–8 tuổi. Kích thích 2 lần/tháng sẽ tiêu hao vỏ sớm, gây khô miệng cạo.</div></div></div>
-  <div class="alert alb"><div class="ai">⏰</div><div><div class="at">[P4] Bốc Mủ Trong 6–8 Tiếng Sau Cạo</div><div class="ad">Mủ chén phải bốc trước khi đông. Cạo 3–4h sáng → bốc trước 11h. Không để qua ngày hôm sau với mủ chén.</div></div></div>
-  <div class="alert alg"><div class="ai">🏅</div><div><div class="at">KV4 – Mô Hình Chuẩn (NSBQ TB 120.6 A+D)</div><div class="ad">Dẫn đầu ổn định. Tổ chức tham quan KV4 cho CN các KV khác. RRIM 600 + cây 10 tuổi + kỹ thuật tốt.</div></div></div>
-  <div class="alert alp"><div class="ai">🌱</div><div><div class="at">KV8 – Thấp Do Cây Non (Không Phải Lỗi CN)</div><div class="ad">Cây 6–8 tuổi + RRIV 115 → KH 1,455 kg/ha. Bình thường. Không áp KPI ngang KV1–6. Cải thiện tự nhiên theo tuổi cây.</div></div></div>
+<div class="card" style="margin-top:16px;">
+<div class="ct">Chi Tiết Từng Khu Vực</div>
+<div class="ts">
+<table id="tb-all"><thead><tr><th>KV</th><th>CN</th><th>SL (kg)</th><th>Nhát</th><th>NSBQ TB</th><th>Min</th><th>Max</th><th>Xếp Loại</th></tr></thead><tbody></tbody></table>
+</div></div>
+
+<div class="g2" style="margin-top:12px;">
+<div class="card"><div class="ct">🏆 Top 10 – NSBQ Cao</div><div class="ts"><table id="tb-top"><thead><tr><th>#</th><th>Mã CN</th><th>KV</th><th>Phiên</th><th>SL</th><th>NSBQ</th></tr></thead><tbody></tbody></table></div></div>
+<div class="card"><div class="ct">📉 Bottom 10 – NSBQ Thấp</div><div class="ts"><table id="tb-bot"><thead><tr><th>#</th><th>Mã CN</th><th>KV</th><th>Phiên</th><th>SL</th><th>NSBQ</th></tr></thead><tbody></tbody></table></div></div>
 </div>
 
-<div class="footer" id="ftxt">CRCK2 Aphivath – Đội 2 · T6/2026 (A+D hardcoded) · 322 công nhân · 8 KV · Giờ cạo 3–4h sáng</div>
+<div class="card" style="margin-top:16px;">
+<div class="ct">⚠️ Cảnh Báo & Khuyến Nghị</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px;">
+<div class="alert alert-warning" style="margin:0;background:#feebc8;color:#744210;">🚨 <strong>[P1] Brown Bast – KV1–4</strong><br>Dừng cạo cây bệnh, cho nghỉ 4–8 tuần.</div>
+<div class="alert alert-warning" style="margin:0;background:#feebc8;color:#744210;">👷 <strong>[P2] 50% CN Mới</strong><br>Ghép đôi CN giỏi–mới, huấn luyện.</div>
+<div class="alert alert-warning" style="margin:0;background:#feebc8;color:#744210;">⚗️ <strong>[P3] KV7/8 – KT Quá Dày</strong><br>1 lần/tháng tối đa.</div>
+<div class="alert alert-warning" style="margin:0;background:#feebc8;color:#744210;">⏰ <strong>[P4] Bốc Mủ 6–8 Tiếng</strong><br>Không để mủ đông qua ngày.</div>
+<div class="alert alert-success" style="margin:0;">🏅 <strong>KV4 – Mô Hình Chuẩn</strong><br>NSBQ TB 120.6 kg/nhát.</div>
+<div class="alert alert-info" style="margin:0;">🌱 <strong>KV8 – Thấp Do Cây Non</strong><br>Không áp KPI ngang KV1-6.</div>
+</div></div>
+
+<div id="lastUpdate" class="timestamp" style="text-align:center;margin-top:20px;"></div>
 </div>
 
 <script>
-/* ═══════ PHIÊN COLORS ═══════ */
-const PC = {
-  a:{color:'#3b82f6',bg:'rgba(59,130,246,.7)',light:'#dbeafe',label:'Phiên A'},
-  b:{color:'#10b981',bg:'rgba(16,185,129,.7)',light:'#d1fae5',label:'Phiên B'},
-  c:{color:'#f59e0b',bg:'rgba(245,158,11,.7)', light:'#fef3c7',label:'Phiên C'},
-  d:{color:'#8b5cf6',bg:'rgba(139,92,246,.7)', light:'#ede9fe',label:'Phiên D'}
-};
-const PHIENS = ['a','b','c','d'];
+const PHIENS=['a','b','c','d'];
+const PC={a:{label:'Phiên A',color:'#3b82f6',bg:'rgba(59,130,246,.75)'},b:{label:'Phiên B',color:'#10b981',bg:'rgba(16,185,129,.75)'},c:{label:'Phiên C',color:'#f59e0b',bg:'rgba(245,158,11,.75)'},d:{label:'Phiên D',color:'#8b5cf6',bg:'rgba(139,92,246,.75)'}};
+const FALLBACK_KVS=['KV1','KV2','KV3','KV4','KV5','KV6','KV7','KV8'];
+const FALLBACK_NOTES=['','RRIM 600','RRIV 107','RRIM 600','PB 260','RRIV 124','RRIV 115','Cây 6-8 tuổi'];
+const DEFAULT_FB_CN=[88,90,78,78,82,76,74,78];
+const KH_NAM=3790000;
+const fb_min=[79.0,92.5,76.4,90.0,58.5,53.8,73.5,33.8];
+const fb_max=[164.0,137.2,140.0,150.5,124.5,165.0,147.0,73.8];
 
-/* ═══════ FALLBACK DATA T6/2026 ═══════ */
-// Only A and D have real T6 data; B and C show as "pending"
-const FALLBACK_KVS = ['KV1','KV2','KV3','KV4','KV5','KV6','KV7','KV8'];
-const FALLBACK_PHIEN = {
-  a:{ sl:[20558,25989,21061,21764,24193,26801,18062,10619], nhat:[220,225,195,195,246,228,185,234],
-      nsbq:[93.4,115.5,108.0,111.6,98.3,117.5,81.4,45.4] },
-  b:{ sl:[], nhat:[], nsbq:[] },  // no data yet – B was T5 in Excel
-  c:{ sl:[], nhat:[], nsbq:[] },  // no data yet
-  d:{ sl:[23799,20738,15165,20202,17428,13528,29930,13183], nhat:[220,225,195,195,246,228,185,234],
-      nsbq:[135.2,115.2,97.2,129.5,70.8,70.9,134.8,56.3] }
-};
-const FB_MIN = [79.0,92.5,76.4,90.0,58.5,53.8,73.5,33.8];
-const FB_MAX = [164.0,137.2,140.0,150.5,124.5,165.0,147.0,73.8];
-const FB_CN  = [44,45,39,39,41,38,37,39];
-const FB_NOTE= ['Tuổi 9·RRIM600','Tuổi 9·PB260','Tuổi 9-10·PB260','Tuổi 10·RRIM600⭐','Tuổi 9.5·PB260','Tuổi 9.5·RRIV124','Tuổi 7-8·Mặt mới','Tuổi 6-8·Cây non⚠'];
-const FB_TOP = [
-  {ma:'Đ2-KV6-01',kv:'KV6',ph:'A',sl:990,nsbq:165.0},{ma:'Đ2-KV6-02',kv:'KV6',ph:'A',sl:990,nsbq:165.0},
-  {ma:'Đ2-KV6-03',kv:'KV6',ph:'A',sl:990,nsbq:165.0},{ma:'Đ2-KV1-15',kv:'KV1',ph:'D',sl:656,nsbq:164.0},
-  {ma:'Đ2-KV1-16',kv:'KV1',ph:'D',sl:650,nsbq:162.5},{ma:'Đ2-KV1-17',kv:'KV1',ph:'D',sl:650,nsbq:162.5},
-  {ma:'Đ2-KV1-22',kv:'KV1',ph:'D',sl:650,nsbq:162.5},{ma:'Đ2-KV1-14',kv:'KV1',ph:'D',sl:646,nsbq:161.5},
-  {ma:'Đ2-KV1-12',kv:'KV1',ph:'D',sl:645,nsbq:161.2},{ma:'Đ2-KV1-21',kv:'KV1',ph:'D',sl:645,nsbq:161.2}
-];
-const FB_BOT = [
-  {ma:'Đ2-KV8-37',kv:'KV8',ph:'A',sl:203,nsbq:33.8},{ma:'Đ2-KV8-38',kv:'KV8',ph:'A',sl:203,nsbq:33.8},
-  {ma:'Đ2-KV8-34',kv:'KV8',ph:'A',sl:206,nsbq:34.3},{ma:'Đ2-KV8-35',kv:'KV8',ph:'A',sl:212,nsbq:35.3},
-  {ma:'Đ2-KV8-36',kv:'KV8',ph:'A',sl:212,nsbq:35.3},{ma:'Đ2-KV8-39',kv:'KV8',ph:'A',sl:212,nsbq:35.3},
-  {ma:'Đ2-KV8-33',kv:'KV8',ph:'A',sl:226,nsbq:37.7},{ma:'Đ2-KV8-32',kv:'KV8',ph:'A',sl:240,nsbq:40.0},
-  {ma:'Đ2-KV8-26',kv:'KV8',ph:'A',sl:246,nsbq:41.0},{ma:'Đ2-KV8-27',kv:'KV8',ph:'A',sl:246,nsbq:41.0}
-];
+const BASE_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQ21nAblF_o62UfIwZ9JHMNuONyUQTBGjVNfPp_SJgdsyKwcd76eQjp4tqGg9mqmg/pub';
+const DEFAULT_LIVE_URLS={a:BASE_URL+'?gid=1605713460&output=csv',b:BASE_URL+'?gid=584631603&output=csv',c:BASE_URL+'?gid=1284696854&output=csv',d:BASE_URL+'?gid=2032734452&output=csv'};
 
-/* ═══════ PRE-FILLED URLs (auto-discovered from published sheet) ═══════ */
-const BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ21nAblF_o62UfIwZ9JHMNuONyUQTBGjVNfPp_SJgdsyKwcd76eQjp4tqGg9mqmg/pub';
-const DEFAULT_URLS = {
-  a: BASE + '?gid=1605713460&output=csv',
-  b: BASE + '?gid=584631603&output=csv',
-  c: BASE + '?gid=1284696854&output=csv',
-  d: BASE + '?gid=2032734452&output=csv'
-};
+const FALLBACK_PHIEN={a:{sl:[44357,46727,36226,41966,41621,40329,47992,23802],nhat:[440,450,390,390,492,456,444,468],nsbq:[114.3,115.4,102.6,120.6,84.6,94.2,108.1,50.9]},b:{sl:[0,0,0,0,0,0,0,0],nhat:[0,0,0,0,0,0,0,0],nsbq:[0,0,0,0,0,0,0,0]},c:{sl:[0,0,0,0,0,0,0,0],nhat:[0,0,0,0,0,0,0,0],nsbq:[0,0,0,0,0,0,0,0]},d:{sl:[36905,40118,31200,35728,36025,34400,41520,20502],nhat:[378,412,306,342,506,460,460,462],nsbq:[93.4,135.2,97.2,129.5,98.3,117.5,81.4,56.3]}};
+const FB_TOP=[{ma:'Đ2-KV6-01',kv:'KV6',ph:'A',sl:990,nsbq:165},{ma:'Đ2-KV6-02',kv:'KV6',ph:'A',sl:990,nsbq:165},{ma:'Đ2-KV6-03',kv:'KV6',ph:'A',sl:990,nsbq:165},{ma:'Đ2-KV1-15',kv:'KV1',ph:'D',sl:656,nsbq:164},{ma:'Đ2-KV1-16',kv:'KV1',ph:'D',sl:650,nsbq:162.5},{ma:'Đ2-KV1-17',kv:'KV1',ph:'D',sl:650,nsbq:162.5},{ma:'Đ2-KV1-22',kv:'KV1',ph:'D',sl:650,nsbq:162.5},{ma:'Đ2-KV1-14',kv:'KV1',ph:'D',sl:646,nsbq:161.5},{ma:'Đ2-KV1-12',kv:'KV1',ph:'D',sl:645,nsbq:161.2},{ma:'Đ2-KV1-21',kv:'KV1',ph:'D',sl:645,nsbq:161.2}];
+const FB_BOT=[{ma:'Đ2-KV8-37',kv:'KV8',ph:'A',sl:203,nsbq:33.8},{ma:'Đ2-KV8-38',kv:'KV8',ph:'A',sl:203,nsbq:33.8},{ma:'Đ2-KV8-34',kv:'KV8',ph:'A',sl:206,nsbq:34.3},{ma:'Đ2-KV8-35',kv:'KV8',ph:'A',sl:212,nsbq:35.3},{ma:'Đ2-KV8-36',kv:'KV8',ph:'A',sl:212,nsbq:35.3},{ma:'Đ2-KV8-39',kv:'KV8',ph:'A',sl:212,nsbq:35.3},{ma:'Đ2-KV8-33',kv:'KV8',ph:'A',sl:226,nsbq:37.7},{ma:'Đ2-KV8-32',kv:'KV8',ph:'A',sl:240,nsbq:40},{ma:'Đ2-KV8-26',kv:'KV8',ph:'A',sl:246,nsbq:41},{ma:'Đ2-KV8-27',kv:'KV8',ph:'A',sl:246,nsbq:41}];
 
-/* ═══════ STATE ═══════ */
-const urls = {a:'',b:'',c:'',d:''};
-const liveData = {a:null,b:null,c:null,d:null}; // parsed workers per phien
-let charts = {};
+let state={currentMode:'live',currentMonth:null,liveURLs:{a:'',b:'',c:'',d:''},liveData:{a:null,b:null,c:null,d:null},historyData:{},monthConfigs:{},charts:{},lastLoadTime:null};
 
-// Load saved URLs (or use defaults)
-PHIENS.forEach(p=>{
-  const saved = localStorage.getItem('url_'+p) || DEFAULT_URLS[p];
-  urls[p] = saved;
-  document.getElementById('u'+p).value = saved;
-});
+function init(){loadFromStorage();PHIENS.forEach(p=>{if(!state.liveURLs[p])state.liveURLs[p]=localStorage.getItem('url_'+p)||DEFAULT_LIVE_URLS[p];document.getElementById('u'+p).value=state.liveURLs[p];});setStatus('warn','Nhấn ↻ để tải dữ liệu');renderAll();setInterval(()=>{if(state.currentMode==='live'&&PHIENS.some(p=>state.liveURLs[p]))refreshAll();},5*60*1000);}
+function loadFromStorage(){try{const s=localStorage.getItem('dashboardState');if(s){const p=JSON.parse(s);state.liveURLs=p.liveURLs||state.liveURLs;state.monthConfigs=p.monthConfigs||{};state.currentMonth=p.currentMonth;state.currentMode=p.currentMode||'live';}}catch(e){}}
+function saveToStorage(){try{localStorage.setItem('dashboardState',JSON.stringify({liveURLs:state.liveURLs,monthConfigs:state.monthConfigs,currentMonth:state.currentMonth,currentMode:state.currentMode}));}catch(e){}}
 
-/* ═══════ CSV PARSER ═══════ */
-function csvLine(line){
-  const r=[];let c='';let q=false;
-  for(let i=0;i<line.length;i++){
-    const ch=line[i];
-    if(ch==='"'){q=!q;}
-    else if(ch===','&&!q){r.push(c.trim());c='';}
-    else{c+=ch;}
-  }
-  r.push(c.trim());return r;
-}
+function csvLine(line){const r=[],c='';let q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c.trim());c='';}else{c+=ch;}}r.push(c.trim());return r;}
 function getKV(s){const m=String(s).match(/KV(\d+)/i);return m?'KV'+m[1]:'';}
+function parseCSV(txt,pl){const ws=[];const ls=txt.split('\n');for(const l of ls){if(!l.trim())continue;const cs=csvLine(l);const stt=parseFloat(cs[0]);if(!stt||isNaN(stt)||stt<=0||stt>1000)continue;const maTo=cs[1]||'',maCN=cs[2]||'';const kv=getKV(maTo)||getKV(maCN);if(!kv)continue;let sl=0,nhat=0;const s100=parseFloat(cs[100]),n100=parseFloat(cs[102]);if(s100>0&&!isNaN(s100)){sl=s100;nhat=isNaN(n100)?0:n100;}else{for(let j=8;j<Math.min(cs.length-2,101);j+=3){const ds=parseFloat(cs[j]),dn=parseFloat(cs[j+1]);if(ds>0&&!isNaN(ds)){sl+=ds;if(!isNaN(dn))nhat+=dn;}}}const nsbq=nhat>0?sl/nhat:0;ws.push({maTo,maCN,kv,sl,nhat,nsbq,phien:pl.toUpperCase()});}return ws;}
 
-function parseCSV(txt, phienLabel){
-  const workers=[];
-  const lines=txt.split('\n');
-  for(const line of lines){
-    if(!line.trim())continue;
-    const cols=csvLine(line);
-    const stt=parseFloat(cols[0]);
-    if(!stt||isNaN(stt)||stt<=0||stt>1000)continue;
-    const maTo=cols[1]||'',maCN=cols[2]||'';
-    const kv=getKV(maTo)||getKV(maCN);
-    if(!kv)continue;
-    let sl=0,nhat=0;
-    // Try summary cols ~100
-    const s100=parseFloat(cols[100]),n100=parseFloat(cols[102]);
-    if(s100>0&&!isNaN(s100)){sl=s100;nhat=isNaN(n100)?0:n100;}
-    else{
-      for(let j=8;j<Math.min(cols.length-2,101);j+=3){
-        const ds=parseFloat(cols[j]),dn=parseFloat(cols[j+1]);
-        if(ds>0&&!isNaN(ds)){sl+=ds;if(!isNaN(dn))nhat+=dn;}
-      }
-    }
-    const nsbq=nhat>0?sl/nhat:0;
-    workers.push({maTo,maCN,kv,sl,nhat,nsbq,phien:phienLabel.toUpperCase()});
-  }
-  return workers;
-}
-
-/* ═══════ BUILD KV SUMMARY FROM WORKERS ═══════ */
-function buildSummary(phienWorkers){
-  // phienWorkers = {a:[...], b:[...], c:[...], d:[...]}
-  // Find all KVs
-  const allW=Object.values(phienWorkers).flat();
-  const kvSet=new Set(allW.map(w=>w.kv).filter(Boolean));
-  const kvs=Array.from(kvSet).sort((a,b)=>parseInt(a.replace('KV',''))-parseInt(b.replace('KV','')));
-
-  const perPhien={};
-  PHIENS.forEach(p=>{
-    const ws=phienWorkers[p]||[];
-    const kdata={};
-    for(const kv of kvs){
-      const wk=ws.filter(w=>w.kv===kv);
-      const totalSL=wk.reduce((s,w)=>s+w.sl,0);
-      const totalNhat=wk.reduce((s,w)=>s+w.nhat,0);
-      const nsbqs=wk.filter(w=>w.nsbq>0).map(w=>w.nsbq);
-      kdata[kv]={
-        sl:Math.round(totalSL),
-        nhat:Math.round(totalNhat),
-        nsbq:totalNhat>0?totalSL/totalNhat:0,
-        nsbqAvg:nsbqs.length?nsbqs.reduce((s,v)=>s+v,0)/nsbqs.length:0,
-        cn:wk.length
-      };
-    }
-    // phien totals
-    const wAll=ws.filter(w=>w.nsbq>0);
-    perPhien[p]={
-      kdata,
-      totalSL:ws.reduce((s,w)=>s+w.sl,0),
-      totalNhat:ws.reduce((s,w)=>s+w.nhat,0),
-      nsbqTB:ws.reduce((s,w)=>s+w.nhat,0)>0?ws.reduce((s,w)=>s+w.sl,0)/ws.reduce((s,w)=>s+w.nhat,0):0,
-      nsbqMax:wAll.length?Math.max(...wAll.map(w=>w.nsbq)):0,
-      nsbqMin:wAll.length?Math.min(...wAll.map(w=>w.nsbq)):0,
-      cn:ws.length
-    };
-  });
-
-  // Combined per KV
-  const nsbq_all={}, sl_all={}, nhat_all={}, nsbq_min={}, nsbq_max={}, cn_kv={};
-  for(const kv of kvs){
-    const allKV=allW.filter(w=>w.kv===kv&&w.nsbq>0);
-    const allSL=PHIENS.reduce((s,p)=>s+(perPhien[p].kdata[kv]?.sl||0),0);
-    const allNhat=PHIENS.reduce((s,p)=>s+(perPhien[p].kdata[kv]?.nhat||0),0);
-    sl_all[kv]=allSL;nhat_all[kv]=allNhat;
-    nsbq_all[kv]=allNhat>0?allSL/allNhat:0;
-    nsbq_min[kv]=allKV.length?Math.min(...allKV.map(w=>w.nsbq)):0;
-    nsbq_max[kv]=allKV.length?Math.max(...allKV.map(w=>w.nsbq)):0;
-    cn_kv[kv]=Math.max(...PHIENS.map(p=>perPhien[p].kdata[kv]?.cn||0));
-  }
-
-  // Dist bins
-  const dist=[0,0,0,0,0];
-  for(const w of allW.filter(w=>w.nsbq>0)){
-    const bins=[40,60,80,100,99999];
-    for(let i=0;i<bins.length;i++){if(w.nsbq<bins[i]){dist[i]++;break;}}
-  }
-
-  const top10=[...allW].sort((a,b)=>b.nsbq-a.nsbq).slice(0,10)
-    .map(w=>({ma:w.maCN,kv:w.kv,ph:w.phien,sl:Math.round(w.sl),nsbq:+w.nsbq.toFixed(1)}));
-  const bot10=[...allW.filter(w=>w.nsbq>0)].sort((a,b)=>a.nsbq-b.nsbq).slice(0,10)
-    .map(w=>({ma:w.maCN,kv:w.kv,ph:w.phien,sl:Math.round(w.sl),nsbq:+w.nsbq.toFixed(1)}));
-
-  const grandSL=PHIENS.reduce((s,p)=>s+perPhien[p].totalSL,0);
-  const grandNhat=PHIENS.reduce((s,p)=>s+perPhien[p].totalNhat,0);
-  return { kvs, perPhien, nsbq_all, sl_all, nhat_all, nsbq_min, nsbq_max, cn_kv, dist, top10, bot10,
-           grandSL, grandNhat, grandNSBQ:grandNhat>0?grandSL/grandNhat:0 };
-}
-
-/* ═══════ GET DISPLAY DATA ═══════ */
-function getDisplayData(){
-  // Merge live data with fallback
-  const phienWorkers={};
-  let anyLive=false;
-  PHIENS.forEach(p=>{
-    if(liveData[p]&&liveData[p].length>0){
-      phienWorkers[p]=liveData[p]; anyLive=true;
-    } else {
-      // Build synthetic workers from fallback
-      const fb=FALLBACK_PHIEN[p];
-      if(!fb.sl.length){phienWorkers[p]=[];return;}
-      phienWorkers[p]=FALLBACK_KVS.map((kv,i)=>({
-        maTo:`Đ2.${kv}`,maCN:`(fallback)`,kv,
-        sl:fb.sl[i]||0,nhat:fb.nhat[i]||0,
-        nsbq:fb.nsbq[i]||0,phien:p.toUpperCase()
-      }));
-    }
-  });
-  const S=buildSummary(phienWorkers);
-  // Patch min/max from fallback if not enough live data
-  if(!anyLive){
-    FALLBACK_KVS.forEach((kv,i)=>{S.nsbq_min[kv]=FB_MIN[i];S.nsbq_max[kv]=FB_MAX[i];});
-    S.top10=FB_TOP;S.bot10=FB_BOT;
-    S.grandSL=323020;S.grandNhat=3326;S.grandNSBQ=96.9;
-    S.dist=[7,69,96,153,319];
-  }
-  return S;
-}
-
-/* ═══════ RENDER ═══════ */
-function fmt(n){return Math.round(n).toLocaleString('vi-VN');}
-function nsbqPill(v){
-  if(v>=100)return`<span class="pill pg">${v.toFixed(1)}</span>`;
-  if(v>=80)return`<span class="pill py">${v.toFixed(1)}</span>`;
-  if(v>=60)return`<span class="pill po">${v.toFixed(1)}</span>`;
-  if(v>0)return`<span class="pill pr">${v.toFixed(1)}</span>`;
-  return`<span class="pill" style="background:#edf2f7;color:#718096">N/A</span>`;
-}
-function ratePill(v){
-  if(v>=100)return`<span class="pill pg">Xuất sắc</span>`;
-  if(v>=80)return`<span class="pill py">Tốt</span>`;
-  if(v>=60)return`<span class="pill po">TB</span>`;
-  if(v>0)return`<span class="pill pr">Yếu</span>`;
-  return`<span class="pill" style="background:#edf2f7;color:#718096">N/A</span>`;
-}
-function diffBadge(v,avg){
-  if(!v||!avg)return'';
-  const d=v-avg,s=d>=0?'+':'';
-  const cls=d>=5?'pg':d<=-5?'pr':'py';
-  return`<span class="pill ${cls}">${s}${d.toFixed(1)}</span>`;
-}
-
-function mkChart(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);}
-const OPTS_BASE={responsive:true,maintainAspectRatio:false};
-
-function renderAll(){
-  const S=getDisplayData();
-  const kvs=S.kvs.length?S.kvs:FALLBACK_KVS;
-  const connCount=PHIENS.filter(p=>liveData[p]&&liveData[p].length>0).length;
-
-  // Header KPIs
-  const pct=(S.grandSL/3790000*100).toFixed(1);
-  document.getElementById('hsl').textContent=fmt(S.grandSL);
-  document.getElementById('hnsbq').textContent=S.grandNSBQ.toFixed(1);
-  document.getElementById('k-sl').innerHTML=`${fmt(S.grandSL)} <small style="font-size:12px;font-weight:500">kg</small>`;
-  const slParts=PHIENS.map(p=>`${p.toUpperCase()}: ${fmt(S.perPhien[p].totalSL)}`).join(' · ');
-  document.getElementById('k-sl-s').textContent=slParts;
-  document.getElementById('k-sl-b').style.width=Math.min(pct,100)+'%';
-  document.getElementById('k-pct').textContent=`KH 3,790,000 kg — đạt ${pct}%`;
-  document.getElementById('k-nsbq').innerHTML=`${S.grandNSBQ.toFixed(1)} <small style="font-size:12px;font-weight:500">kg/nhát</small>`;
-  document.getElementById('k-nsbq-b').style.width=Math.min(S.grandNSBQ/125*100,100)+'%';
-  const totalNhat=PHIENS.reduce((s,p)=>s+S.perPhien[p].totalNhat,0);
-  document.getElementById('k-nhat').innerHTML=`${fmt(totalNhat)} <small style="font-size:12px;font-weight:500">nhát</small>`;
-  document.getElementById('k-conn').innerHTML=`${connCount}/4 <small style="font-size:12px;font-weight:500">phiên</small>`;
-  document.getElementById('k-conn-s').textContent=connCount===4?'Tất cả phiên kết nối ✅':connCount>0?`Đã kết nối: ${PHIENS.filter(p=>liveData[p]?.length>0).map(p=>p.toUpperCase()).join(', ')}`:'Kết nối Sheet để xem live';
-
-  // Phien stat cards
-  const psEl=document.getElementById('phien-stats');
-  psEl.innerHTML=PHIENS.map(p=>{
-    const pdata=S.perPhien[p];
-    const live=liveData[p]&&liveData[p].length>0;
-    const cls=live?'':'ps-disconnected';
-    return`<div class="phien-stat ${cls}" style="border-top:3px solid ${PC[p].color}">
-      <div class="ps-header">
-        <div class="ps-badge" style="background:${PC[p].color}">${p.toUpperCase()}</div>
-        <div><div class="ps-title">${PC[p].label}</div><div class="ps-sub">${live?'Live ✅':'Chưa kết nối'}</div></div>
-      </div>
-      <div class="ps-val">${fmt(pdata.totalSL)} <small style="font-size:12px;font-weight:500">kg</small></div>
-      <div class="ps-detail">
-        NSBQ TB: <strong>${pdata.nsbqTB.toFixed(1)}</strong> kg/nhát<br>
-        ${pdata.totalNhat?fmt(pdata.totalNhat)+' nhát · '+pdata.cn+' phần cạo':'—'}
-      </div>
-    </div>`;
-  }).join('');
-
-  // Chart 1: NSBQ grouped bar (4 phien per KV)
-  mkChart('cNSBQ',{type:'bar',data:{labels:kvs,datasets:PHIENS.map(p=>({
-    label:PC[p].label,data:kvs.map(kv=>+(S.perPhien[p].kdata[kv]?.nsbqAvg||0).toFixed(1)),
-    backgroundColor:PC[p].bg,borderRadius:4,borderSkipped:false
-  }))},options:{...OPTS_BASE,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},
-    scales:{y:{grid:{color:'#edf2f7'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
-
-  // Chart 2: SL stacked
-  mkChart('cSL',{type:'bar',data:{labels:kvs,datasets:PHIENS.map(p=>({
-    label:PC[p].label,data:kvs.map(kv=>S.perPhien[p].kdata[kv]?.sl||0),
-    backgroundColor:PC[p].bg,borderRadius:3,borderSkipped:false
-  }))},options:{...OPTS_BASE,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},
-    scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}},y:{stacked:true,grid:{color:'#edf2f7'},ticks:{font:{size:10},callback:v=>(v/1000).toFixed(0)+'k'}}}}});
-
-  // Chart 3: Distribution donut
-  mkChart('cDist',{type:'doughnut',data:{labels:['<40','40–60','60–80','80–100','≥100'],
-    datasets:[{data:S.dist,backgroundColor:['#fc8181','#f6ad55','#fbd38d','#68d391','#4299e1'],borderWidth:2,borderColor:'#fff'}]},
-    options:{...OPTS_BASE,cutout:'60%',plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:10},padding:7}}}}});
-
-  // Chart 4: Line NSBQ all phien
-  mkChart('cLine',{type:'line',data:{labels:kvs,datasets:PHIENS.map(p=>({
-    label:PC[p].label,
-    data:kvs.map(kv=>+(S.perPhien[p].kdata[kv]?.nsbqAvg||0).toFixed(1)),
-    borderColor:PC[p].color,backgroundColor:'transparent',tension:.3,
-    pointRadius:4,pointBackgroundColor:PC[p].color,borderWidth:2
-  }))},options:{...OPTS_BASE,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},
-    scales:{y:{grid:{color:'#edf2f7'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
-
-  // Chart 5: Gap
-  mkChart('cGap',{type:'bar',data:{labels:kvs,datasets:[
-    {label:'Min',data:kvs.map(kv=>+(S.nsbq_min[kv]||0).toFixed(1)),backgroundColor:'#fc8181',borderRadius:4,borderSkipped:false},
-    {label:'Max',data:kvs.map(kv=>+(S.nsbq_max[kv]||0).toFixed(1)),backgroundColor:'#68d391',borderRadius:4,borderSkipped:false}
-  ]},options:{...OPTS_BASE,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},
-    scales:{y:{grid:{color:'#edf2f7'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
-
-  // Table ALL
-  const tbAll=document.getElementById('tb-all'); tbAll.innerHTML='';
-  kvs.forEach((kv,i)=>{
-    const sl=kvs.map?PHIENS.reduce((s,p)=>s+(S.perPhien[p].kdata[kv]?.sl||0),0):0;
-    const nhat=PHIENS.reduce((s,p)=>s+(S.perPhien[p].kdata[kv]?.nhat||0),0);
-    const nsbq=S.nsbq_all[kv]||0;
-    const cn=S.cn_kv[kv]||FB_CN[i]||0;
-    tbAll.innerHTML+=`<tr>
-      <td><strong>${kv}</strong></td><td class="tc">${cn}×4</td>
-      <td class="tr2">${fmt(sl)}</td><td class="tr2">${fmt(nhat)}</td>
-      <td class="tr2">${nsbqPill(nsbq)}</td>
-      <td class="tr2" style="color:var(--muted)">${(S.nsbq_min[kv]||0).toFixed(1)}</td>
-      <td class="tr2" style="color:var(--green)">${(S.nsbq_max[kv]||0).toFixed(1)}</td>
-      <td class="tc">${ratePill(nsbq)}</td>
-      <td style="font-size:11px;color:var(--muted)">${FB_NOTE[FALLBACK_KVS.indexOf(kv)]||''}</td>
-    </tr>`;
-  });
-
-  // Per-phien tabs
-  PHIENS.forEach(p=>{
-    const tb=document.getElementById('tb-'+p); tb.innerHTML='';
-    const avgAll=S.grandNSBQ;
-    kvs.forEach(kv=>{
-      const kd=S.perPhien[p].kdata[kv]||{sl:0,nhat:0,nsbqAvg:0};
-      tb.innerHTML+=`<tr>
-        <td><strong>${kv}</strong></td>
-        <td class="tr2">${kd.sl?fmt(kd.sl):'—'}</td>
-        <td class="tr2">${kd.nhat?fmt(kd.nhat):'—'}</td>
-        <td class="tr2">${kd.nsbqAvg?nsbqPill(kd.nsbqAvg):'<span class="pill" style="background:#edf2f7;color:#718096">N/A</span>'}</td>
-        <td class="tc">${kd.nsbqAvg?ratePill(kd.nsbqAvg):'—'}</td>
-        <td class="tr2">${kd.nsbqAvg?diffBadge(kd.nsbqAvg,S.grandNSBQ):'—'}</td>
-      </tr>`;
-    });
-  });
-
-  // Top/Bot
-  const tbTop=document.getElementById('tb-top'); tbTop.innerHTML='';
-  (S.top10.length?S.top10:FB_TOP).forEach((w,i)=>{
-    tbTop.innerHTML+=`<tr><td style="color:var(--muted)">${i+1}</td><td><strong>${w.ma}</strong></td>
-      <td><span class="pill pg">${w.kv}</span></td>
-      <td class="tc"><span style="font-weight:700;color:${PC[w.ph.toLowerCase()]?.color||'#555'}">${w.ph}</span></td>
-      <td class="tr2">${fmt(w.sl)}</td><td class="tr2"><strong style="color:var(--green)">${w.nsbq.toFixed(1)}</strong></td></tr>`;
-  });
-  const tbBot=document.getElementById('tb-bot'); tbBot.innerHTML='';
-  (S.bot10.length?S.bot10:FB_BOT).forEach((w,i)=>{
-    tbBot.innerHTML+=`<tr><td style="color:var(--muted)">${i+1}</td><td><strong>${w.ma}</strong></td>
-      <td><span class="pill po">${w.kv}</span></td>
-      <td class="tc"><span style="font-weight:700;color:${PC[w.ph.toLowerCase()]?.color||'#555'}">${w.ph}</span></td>
-      <td class="tr2">${fmt(w.sl)}</td><td class="tr2"><strong style="color:var(--red)">${w.nsbq.toFixed(1)}</strong></td></tr>`;
-  });
-
-  // Footer
-  document.getElementById('ftxt').textContent=connCount>0
-    ?`CRCK2 Aphivath – Đội 2 · ${connCount}/4 phiên live · Cập nhật: ${new Date().toLocaleString('vi-VN')}`
-    :`CRCK2 Aphivath – Đội 2 · T6/2026 (A+D hardcoded, B+C chờ kết nối) · 322 CN · 8 KV`;
-}
-
-/* ═══════ CONNECTION ═══════ */
-function setStatus(type,msg){
-  const d=document.getElementById('dot'),t=document.getElementById('stxt');
-  d.className='dot '+{ok:'dok',warn:'dwarn',err:'derr',load:'dload'}[type];
-  t.textContent=msg;
-}
-function updateBadges(){
-  PHIENS.forEach(p=>{
-    const el=document.getElementById('badge-'+p);
-    if(liveData[p]&&liveData[p].length>0)el.classList.add('connected');
-    else el.classList.remove('connected');
-  });
-}
-
-async function connectOne(p){
-  const url=document.getElementById('u'+p).value.trim();
-  if(!url){alert('Vui lòng nhập URL cho Phiên '+p.toUpperCase());return;}
-  setStatus('load',`Đang kết nối Phiên ${p.toUpperCase()}...`);
+let fetchErrors={a:'',b:'',c:'',d:''};
+// Try direct fetch first - works for published CSV URLs
+async function fetchCSV_Direct(url,phien){
+  console.log('Trying direct fetch for',phien,url);
   try{
-    const r=await fetch(url,{mode:'cors'});
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const csv=await r.text();
-    if(!csv||csv.length<50)throw new Error('Dữ liệu trống');
-    const workers=parseCSV(csv,p);
-    if(!workers.length)throw new Error('Không tìm thấy dữ liệu công nhân');
-    liveData[p]=workers;
-    urls[p]=url;localStorage.setItem('url_'+p,url);
-    updateBadges();
-    const conn=PHIENS.filter(p=>liveData[p]?.length>0).length;
-    setStatus('ok',`${conn}/4 phiên kết nối · Phiên ${p.toUpperCase()}: ${workers.length} CN`);
-    renderAll();
-    if(conn===4)document.getElementById('setup').classList.add('gone');
-  }catch(e){
-    setStatus('err',`Phiên ${p.toUpperCase()} lỗi: ${e.message}`);
-  }
+    // Try with no-cors first (might work for Google Sheets)
+    const r1=await fetch(url,{method:'GET',mode:'no-cors'});
+    if(r1.ok || r1.type==='opaque'){
+      const t=await r1.text();
+      console.log('no-cors response:',t.substring(0,200));
+      if(t&&t.trim().length>10){fetchErrors[phien]='';return t;}
+    }
+  }catch(e){console.log('Direct fetch error:',e);}
+  // Try regular cors
+  try{
+    const r=await fetch(url);
+    if(r.ok){const t=await r.text();if(t&&t.trim().length>10){fetchErrors[phien]='';console.log('CORS fetch OK for',phien);return t;}}
+  }catch(e){console.log('CORS fetch failed:',e);}
+  return null;
 }
-
-async function connectAll(){
-  for(const p of PHIENS){
-    const url=document.getElementById('u'+p).value.trim();
-    if(url)await connectOne(p);
-  }
+async function fetchCSV(url,phien){
+  if(!url||!url.trim())return null;
+  console.log('fetchCSV called for',phien,url);
+  // Method 1: Try direct fetch (works for published CSV URLs)
+  const data=await fetchCSV_Direct(url,phien);
+  if(data)return data;
+  // Method 2: Try through allorigins proxy
+  try{
+    const proxyUrl='https://api.allorigins.win/raw?url='+encodeURIComponent(url);
+    const r=await fetch(proxyUrl);
+    if(r.ok){const t=await r.text();if(t&&t.trim().length>10){fetchErrors[phien]='';return t;}}
+  }catch(e){console.log('Proxy failed',e);}
+  fetchErrors[phien]='All methods failed';
+  return null;
 }
+async function loadSession(session,url,target){const txt=await fetchCSV(url,session);if(txt){target[session]=parseCSV(txt,session);return true;}return false;}
 
-async function refreshAll(){
-  const hasAny=PHIENS.some(p=>urls[p]);
-  if(!hasAny){setStatus('warn','Chưa kết nối Sheet');return;}
-  setStatus('load','Đang tải dữ liệu mới nhất...');
-  for(const p of PHIENS){
-    if(!urls[p])continue;
-    try{
-      const r=await fetch(urls[p],{mode:'cors'});
-      if(r.ok){const w=parseCSV(await r.text(),p);if(w.length)liveData[p]=w;}
-    }catch(e){console.warn('Phiên '+p,e);}
-  }
-  const conn=PHIENS.filter(p=>liveData[p]?.length>0).length;
-  updateBadges();
-  setStatus(conn>0?'ok':'warn',conn>0?`${conn}/4 phiên live · ${new Date().toLocaleTimeString('vi-VN')}`:'Không kết nối được Sheet');
-  renderAll();
-}
+async function testConnection(session){const url=document.getElementById('u'+session).value.trim();if(!url)return;showLoading(true);const txt=await fetchCSV(url);showLoading(false);if(txt){const d=parseCSV(txt,session);alert('✅ '+d.length+' records');}else{alert('❌ Không tải được.');}}
+async function testAllConnections(){showLoading(true);let c=0;for(const p of PHIENS){const url=document.getElementById('u'+p).value.trim();if(url){state.liveURLs[p]=url;localStorage.setItem('url_'+p,url);if(await loadSession(p,url,state.liveData))c++;}}showLoading(false);if(c>0){updateBadges();renderAll();saveToStorage();closeSetup();}return c;}
+async function refreshAll(){showLoading(true);let c=0;let errMsg='';for(const p of PHIENS){if(state.liveURLs[p]){if(await loadSession(p,state.liveURLs[p],state.liveData))c++;if(fetchErrors[p])errMsg+=PC[p].label+': '+fetchErrors[p]+'\n';}}showLoading(false);if(c>0||state.currentMode==='history'){updateBadges();renderAll();}if(errMsg){setStatus('err',errMsg);}return c;}
 
-/* ═══════ TABS ═══════ */
-function showTab(name,btn){
-  document.querySelectorAll('.tp').forEach(e=>e.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  btn.classList.add('active');
-}
+function getMonthName(key){const [y,m]=key.split('-');const months=['Giêng','Hai','Ba','Tư','Năm','Sáu','Bảy','Tám','Chín','Mười','Mười Một','Mười Hai'];return'Tháng '+months[parseInt(m)-1]+' '+y;}
+function getDefaultConfigs(){const now=new Date();const cur=now.toISOString().slice(0,7);return{[cur]:{name:getMonthName(cur),isLive:true,urls:{...DEFAULT_LIVE_URLS}},['2026-06']:{name:'Tháng 6/2026',isLive:false,urls:{a:'',b:'',c:'',d:''}}};}
+function initConfigs(){if(Object.keys(state.monthConfigs).length===0){state.monthConfigs=getDefaultConfigs();saveToStorage();}}
+function openHistoryModal(){initConfigs();renderHistoryList();openModal('historyModal');}
 
-/* ═══════ INIT ═══════ */
-window.addEventListener('DOMContentLoaded',async()=>{
-  renderAll();
-  setStatus('load','Đang kết nối 4 phiên A/B/C/D...');
-  document.getElementById('lmsg').textContent='Đang tải dữ liệu 4 phiên...';
-  await refreshAll();
-  setTimeout(()=>document.getElementById('ov').classList.add('gone'),400);
-  const conn=PHIENS.filter(p=>liveData[p]?.length>0).length;
-  if(conn>0){
-    document.getElementById('setup').classList.add('gone');
-    setStatus('ok',`${conn}/4 phiên kết nối live ✅`);
-  } else {
-    setStatus('warn','Chưa tải được dữ liệu – mở setup để kiểm tra URL');
-    setTimeout(()=>document.getElementById('ov').classList.add('gone'),300);
-  }
-});
+function renderHistoryList(){const c=document.getElementById('historyList');const ms=Object.keys(state.monthConfigs).sort().reverse();if(ms.length===0){c.innerHTML='<div class="alert alert-info">Chưa có dữ liệu.</div>';return;}c.innerHTML=ms.map(k=>{const cfg=state.monthConfigs[k];const isAct=state.currentMonth===k&&state.currentMode==='history';const conn=PHIENS.filter(p=>cfg.urls[p]&&state.historyData[k]?.[p]).length;const tot=PHIENS.filter(p=>cfg.urls[p]).length;const isLive=cfg.isLive&&k===ms[0];return'<div class="history-item '+(isAct?'active':'')+'" onclick="selectMonth(\''+k+'\')"><div><div class="hi-month">'+cfg.name+'</div>'+(isLive?'<span class="pill pg" style="font-size:10px">Live</span>':'')+'<div class="hi-sessions">'+PHIENS.map(p=>{const hasD=!!state.historyData[k]?.[p];return'<span class="sb" style="background:'+(hasD?PC[p].color:'#e2e8f0')+'">'+p.toUpperCase()+'</span>';}).join('')+'</div></div><div class="hi-status">'+(tot>0?conn+'/'+tot+' phiên':'Chưa cấu hình')+'</div></div>';}).join('');}
 
-// Auto-refresh every 5 minutes
-setInterval(()=>{if(PHIENS.some(p=>urls[p]))refreshAll();},5*60*1000);
-</script>
+async function selectMonth(key){const cfg=state.monthConfigs[key];if(!cfg)return;if(cfg.isLive&&key===Object.keys(state.monthConfigs).sort().reverse()[0]){state.currentMode='live';state.currentMonth=key;closeModal('historyModal');updateMonthLabel();renderAll();saveToStorage();return;}showLoading(true);state.currentMode='history';state.currentMonth=key;if(!state.historyData[key])state.historyData[key]={a:null,b:null,c:null,d:null};for(const p of PHIENS){if(cfg.urls[p])await loadSession(p,cfg.urls[p],state.historyData[key]);}showLoading(false);updateMonthLabel();renderAll();saveToStorage();renderHistoryList();closeModal('historyModal');}
 
-<!-- PWA Service Worker -->
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js')
-      .then(r=>console.log('SW registered:',r.scope))
-      .catch(e=>console.warn('SW error:',e));
-  });
-}
-// PWA install prompt
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  // Show install button in header
-  const btn = document.createElement('button');
-  btn.className = 'btn-r';
-  btn.textContent = '📲 Cài App';
-  btn.style.cssText = 'background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4)';
-  btn.onclick = async () => {
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if(outcome === 'accepted') btn.remove();
-    deferredPrompt = null;
-  };
-  document.querySelector('.hdr-r').prepend(btn);
-});
+function updateMonthLabel(){const el=document.getElementById('currentMonthLabel');if(state.currentMode==='live'){const liveKey=Object.keys(state.monthConfigs).sort().reverse()[0];const cfg=state.monthConfigs[liveKey];el.className='live';el.innerHTML='📍 Live: '+(cfg?.name||'Tháng Hiện Tại');}else{const cfg=state.monthConfigs[state.currentMonth];el.className='hist';el.innerHTML='📜 '+(cfg?.name||state.currentMonth)+' – Lịch Sử';}}
+
+function openSettingsModal(){initConfigs();renderSettings();openModal('settingsModal');}
+function renderSettings(){const c=document.getElementById('monthConfigs');const ms=Object.keys(state.monthConfigs).sort().reverse();c.innerHTML=ms.map(k=>{const cfg=state.monthConfigs[k];return'<div class="month-editor"><h4>'+cfg.name+(cfg.isLive?'<span class="pill pg" style="font-size:10px">LIVE</span>':'')+'<button class="btn btn-sm2 btn-secondary" onclick="removeMonth(\''+k+'\')" '+(cfg.isLive?'disabled':'')+'>🗑️</button></h4><div class="month-sessions">'+PHIENS.map(p=>'<div class="msession"><label style="color:'+PC[p].color+'">'+PC[p].label+'</label><input type="text" id="cfg-'+k+'-'+p+'" value="'+(cfg.urls[p]||'')+'" placeholder="https://docs.google.com/...csv"></div>').join('')+'</div><div class="settings-actions"><button class="btn btn-sm2 btn-primary" onclick="saveMonth(\''+k+'\')">💾 Lưu</button></div></div>';}).join('');}
+function addNewMonth(){const now=new Date();const y=now.getFullYear(),m=now.getMonth()+1;const k=y+'-'+String(m).padStart(2,'0');if(state.monthConfigs[k]){alert('Tháng này đã tồn tại');return;}state.monthConfigs[k]={name:getMonthName(k),isLive:false,urls:{a:'',b:'',c:'',d:''}};saveToStorage();renderSettings();}
+function removeMonth(key){if(!state.monthConfigs[key]||state.monthConfigs[key].isLive)return;if(confirm('Xóa '+state.monthConfigs[key].name+'?')){delete state.monthConfigs[key];delete state.historyData[key];saveToStorage();renderSettings();renderHistoryList();}}
+function saveMonth(key){if(!state.monthConfigs[key])return;PHIENS.forEach(p=>{state.monthConfigs[key].urls[p]=document.getElementById('cfg-'+key+'-'+p).value.trim();});saveToStorage();renderHistoryList();}
+function saveAllMonths(){document.querySelectorAll('.month-editor').forEach(ed=>{const k=ed.id.replace('month-editor-','');if(state.monthConfigs[k])PHIENS.forEach(p=>{const inp=document.getElementById('cfg-'+k+'-'+p);if(inp)state.monthConfigs[k].urls[p]=inp.value.trim();});});saveToStorage();renderHistoryList();closeModal('settingsModal');}
+
+function buildSummary(pw){const allW=Object.values(pw).flat();const kvSet=new Set(allW.map(w=>w.kv).filter(Boolean));const kvs=Array.from(kvSet).sort((a,b)=>parseInt(a.replace('KV',''))-parseInt(b.replace('KV','')));if(kvs.length===0)kvs.push(...FALLBACK_KVS);const pp={};PHIENS.forEach(p=>{const ws=pw[p]||[];const kd={};for(const kv of kvs){const wk=ws.filter(w=>w.kv===kv);const tSL=wk.reduce((s,w)=>s+w.sl,0);const tNhat=wk.reduce((s,w)=>s+w.nhat,0);const nsbqs=wk.filter(w=>w.nsbq>0).map(w=>w.nsbq);kd[kv]={sl:Math.round(tSL),nhat:Math.round(tNhat),nsbq:tNhat>0?tSL/tNhat:0,nsbqAvg:nsbqs.length?nsbqs.reduce((s,v)=>s+v,0)/nsbqs.length:0,cn:wk.length};}const wAll=ws.filter(w=>w.nsbq>0);pp[p]={kdata:kd,totalSL:ws.reduce((s,w)=>s+w.sl,0),totalNhat:ws.reduce((s,w)=>s+w.nhat,0),nsbqTB:ws.reduce((s,w)=>s+w.nhat,0)>0?ws.reduce((s,w)=>s+w.sl,0)/ws.reduce((s,w)=>s+w.nhat,0):0,nsbqMax:wAll.length?Math.max(...wAll.map(w=>w.nsbq)):0,nsbqMin:wAll.length?Math.min(...wAll.map(w=>w.nsbq)):0,cn:ws.length};});const nsbq_all={},sl_all={},nhat_all={},nsbq_min={},nsbq_max={},cn_kv={};for(const kv of kvs){const allKV=allW.filter(w=>w.kv===kv&&w.nsbq>0);sl_all[kv]=PHIENS.reduce((s,p)=>s+(pp[p].kdata[kv]?.sl||0),0);nhat_all[kv]=PHIENS.reduce((s,p)=>s+(pp[p].kdata[kv]?.nhat||0),0);nsbq_all[kv]=nhat_all[kv]>0?sl_all[kv]/nhat_all[kv]:0;nsbq_min[kv]=allKV.length?Math.min(...allKV.map(w=>w.nsbq)):0;nsbq_max[kv]=allKV.length?Math.max(...allKV.map(w=>w.nsbq)):0;cn_kv[kv]=Math.max(...PHIENS.map(p=>pp[p].kdata[kv]?.cn||0));}const dist=[0,0,0,0,0];for(const w of allW.filter(w=>w.nsbq>0)){const bins=[40,60,80,100,99999];for(let i=0;i<bins.length;i++){if(w.nsbq<bins[i]){dist[i]++;break;}}}const top10=[...allW].sort((a,b)=>b.nsbq-a.nsbq).slice(0,10).map(w=>({ma:w.maCN,kv:w.kv,ph:w.phien,sl:Math.round(w.sl),nsbq:+w.nsbq.toFixed(1)}));const bot10=[...allW.filter(w=>w.nsbq>0)].sort((a,b)=>a.nsbq-b.nsbq).slice(0,10).map(w=>({ma:w.maCN,kv:w.kv,ph:w.phien,sl:Math.round(w.sl),nsbq:+w.nsbq.toFixed(1)}));const gSL=PHIENS.reduce((s,p)=>s+pp[p].totalSL,0);const gNhat=PHIENS.reduce((s,p)=>s+pp[p].totalNhat,0);return{kvs,perPhien:pp,nsbq_all,sl_all,nhat_all,nsbq_min,nsbq_max,cn_kv,dist,top10,bot10,grandSL:gSL,grandNhat:gNhat,grandNSBQ:gNhat>0?gSL/gNhat:0};}
+
+function getDisplayData(){const pw={};let anyLive=false;if(state.currentMode==='live'){PHIENS.forEach(p=>{if(state.liveData[p]&&state.liveData[p].length>0){pw[p]=state.liveData[p];anyLive=true;}else pw[p]=[];});}else{const hd=state.historyData[state.currentMonth]||{};PHIENS.forEach(p=>{if(hd[p]&&hd[p].length>0){pw[p]=hd[p];anyLive=true;}else pw[p]=[];});}if(!anyLive){PHIENS.forEach(p=>{const fb=FALLBACK_PHIEN[p];if(!fb.sl.length){pw[p]=[];return;}pw[p]=FALLBACK_KVS.map((kv,i)=>({maTo:'Đ2.'+kv,maCN:'(fallback)',kv,sl:fb.sl[i]||0,nhat:fb.nhat[i]||0,nsbq:fb.nsbq[i]||0,phien:p.toUpperCase()}));});}const S=buildSummary(pw);if(!anyLive){FALLBACK_KVS.forEach((kv,i)=>{S.nsbq_min[kv]=fb_min[i];S.nsbq_max[kv]=fb_max[i];});S.top10=FB_TOP;S.bot10=FB_BOT;S.grandSL=323020;S.grandNhat=3326;S.grandNSBQ=96.9;S.dist=[7,69,96,153,319];}return S;}
+
+function fmt(n){return Math.round(n).toLocaleString('vi-VN');}
+function nsbqPill(v){if(v>=100)return'<span class="pill pg">'+v.toFixed(1)+'</span>';if(v>=80)return'<span class="pill py">'+v.toFixed(1)+'</span>';if(v>=60)return'<span class="pill" style="background:#fefcbf;color:#744210">'+v.toFixed(1)+'</span>';if(v>0)return'<span class="pill pr">'+v.toFixed(1)+'</span>';return'<span class="pill" style="background:#edf2f7;color:#718096">N/A</span>';}
+function ratePill(v){if(v>=100)return'<span class="pill pg">Xuất sắc</span>';if(v>=80)return'<span class="pill py">Tốt</span>';if(v>=60)return'<span class="pill" style="background:#fefcbf;color:#744210">TB</span>';if(v>0)return'<span class="pill pr">Yếu</span>';return'<span class="pill" style="background:#edf2f7;color:#718096">N/A</span>';}
+function mkChart(id,cfg){if(state.charts[id])state.charts[id].destroy();state.charts[id]=new Chart(document.getElementById(id),cfg);}
+const OB={responsive:true,maintainAspectRatio:false};
+
+function renderAll(){const S=getDisplayData();const kvs=S.kvs.length?S.kvs:FALLBACK_KVS;let conn=0;if(state.currentMode==='live')conn=PHIENS.filter(p=>state.liveData[p]&&state.liveData[p].length>0).length;else{const hd=state.historyData[state.currentMonth];if(hd)conn=PHIENS.filter(p=>hd[p]&&hd[p].length>0).length;}setStatus(conn>0?'ok':'warn',conn>0?conn+'/4 phiên kết nối ✅':'Chưa có dữ liệu');const pct=(S.grandSL/KH_NAM*100).toFixed(1);document.getElementById('k-sl').innerHTML=fmt(S.grandSL)+' <small style="font-size:12px">kg</small>';document.getElementById('k-sl-s').textContent=PHIENS.map(p=>p.toUpperCase()+': '+fmt(S.perPhien[p].totalSL)).join(' · ');document.getElementById('k-sl-b').style.width=Math.min(pct,100)+'%';document.getElementById('k-nsbq').innerHTML=S.grandNSBQ.toFixed(1)+' <small style="font-size:12px">kg/nhát</small>';document.getElementById('k-nsbq-b').style.width=Math.min(S.grandNSBQ/125*100,100)+'%';document.getElementById('k-nhat').innerHTML=fmt(S.grandNhat)+' <small style="font-size:12px">nhát</small>';document.getElementById('k-conn').innerHTML=conn+'/4 <small style="font-size:12px">phiên</small>';document.getElementById('k-conn-s').textContent=conn===4?'Tất cả kết nối ✅':conn>0?'Đã kết nối: '+PHIENS.filter(p=>{if(state.currentMode==='live')return state.liveData[p]?.length>0;return state.historyData[state.currentMonth]?.[p]?.length>0;}).map(p=>p.toUpperCase()).join(', '):'Kết nối Sheet để xem';const psEl=document.getElementById('phien-stats');psEl.innerHTML=PHIENS.map(p=>{const pd=S.perPhien[p];let hasD=false;if(state.currentMode==='live')hasD=!!(state.liveData[p]&&state.liveData[p].length>0);else hasD=!!(state.historyData[state.currentMonth]?.[p]&&state.historyData[state.currentMonth][p].length>0);const cls=hasD?'':'disconnected';return'<div class="phien-stat '+cls+'" style="border-top:3px solid '+PC[p].color+'"><div class="ps-header"><div class="ps-badge" style="background:'+PC[p].color+'">'+p.toUpperCase()+'</div><div><div class="ps-title">'+PC[p].label+'</div><div class="ps-sub">'+(hasD?'Live ✅':'Chưa kết nối')+'</div></div></div><div class="ps-val">'+fmt(pd.totalSL)+' <small style="font-size:12px">kg</small></div><div class="ps-detail">NSBQ TB: <strong>'+pd.nsbqTB.toFixed(1)+'</strong> kg/nhát<br>'+(pd.totalNhat?fmt(pd.totalNhat)+' nhát · '+pd.cn+' phần cạo':'—')+'</div></div>';}).join('');mkChart('cNSBQ',{type:'bar',data:{labels:kvs,datasets:PHIENS.map(p=>({label:PC[p].label,data:kvs.map(kv=>+(S.perPhien[p].kdata[kv]?.nsbqAvg||0).toFixed(1)),backgroundColor:PC[p].bg,borderRadius:4,borderSkipped:false}))},options:{...OB,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{y:{grid:{color:'#edf2f7'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});mkChart('cSL',{type:'bar',data:{labels:kvs,datasets:PHIENS.map(p=>({label:PC[p].label,data:kvs.map(kv=>S.perPhien[p].kdata[kv]?.sl||0),backgroundColor:PC[p].bg,borderRadius:3,borderSkipped:false}))},options:{...OB,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}},y:{stacked:true,grid:{color:'#edf2f7'},ticks:{font:{size:10},callback:v=>(v/1000).toFixed(0)+'k'}}}}});
+mkChart('cDist',{type:'doughnut',data:{labels:['<40','40–60','60–80','80–100','≥100'],datasets:[{data:S.dist,backgroundColor:['#fc8181','#f6ad55','#fbd38d','#68d391','#4299e1'],borderWidth:2,borderColor:'#fff'}]},options:{...OB,cutout:'60%',plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:10},padding:7}}}}});mkChart('cLine',{type:'line',data:{labels:kvs,datasets:PHIENS.map(p=>({label:PC[p].label,data:kvs.map(kv=>+(S.perPhien[p].kdata[kv]?.nsbqAvg||0).toFixed(1)),borderColor:PC[p].color,backgroundColor:'transparent',tension:.3,pointRadius:4,pointBackgroundColor:PC[p].color,borderWidth:2}))},options:{...OB,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{y:{grid:{color:'#edf2f7'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});mkChart('cGap',{type:'bar',data:{labels:kvs,datasets:[{label:'Min',data:kvs.map(kv=>+(S.nsbq_min[kv]||0).toFixed(1)),backgroundColor:'#fc8181',borderRadius:4,borderSkipped:false},{label:'Max',data:kvs.map(kv=>+(S.nsbq_max[kv]||0).toFixed(1)),backgroundColor:'#68d391',borderRadius:4,borderSkipped:false}]},options:{...OB,plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:10}}}},scales:{y:{grid:{color:'#edf2f7'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});const tbAll=document.getElementById('tb-all');tbAll.innerHTML='';kvs.forEach((kv,i)=>{const sl=PHIENS.reduce((s,p)=>s+(S.perPhien[p].kdata[kv]?.sl||0),0);const nhat=PHIENS.reduce((s,p)=>s+(S.perPhien[p].kdata[kv]?.nhat||0),0);const nsbq=S.nsbq_all[kv]||0;const cn=S.cn_kv[kv]||DEFAULT_FB_CN[i]||0;tbAll.innerHTML+='<tr><td><strong>'+kv+'</strong></td><td class="tc">'+cn+'×4</td><td class="tr2">'+fmt(sl)+'</td><td class="tr2">'+fmt(nhat)+'</td><td class="tr2">'+nsbqPill(nsbq)+'</td><td class="tr2" style="color:var(--muted)">'+(S.nsbq_min[kv]||0).toFixed(1)+'</td><td class="tr2" style="color:var(--green)">'+(S.nsbq_max[kv]||0).toFixed(1)+'</td><td class="tc">'+ratePill(nsbq)+'</td></tr>';});const tbTop=document.getElementById('tb-top');tbTop.innerHTML='';(S.top10.length?S.top10:FB_TOP).forEach((w,i)=>{tbTop.innerHTML+='<tr><td style="color:var(--muted)">'+(i+1)+'</td><td><strong>'+w.ma+'</strong></td><td><span class="pill pg">'+w.kv+'</span></td><td class="tc"><span style="font-weight:700;color:'+(PC[w.ph.toLowerCase()]?.color||'#555')+'">'+w.ph+'</span></td><td class="tr2">'+fmt(w.sl)+'</td><td class="tr2"><strong style="color:var(--green)">'+w.nsbq.toFixed(1)+'</strong></td></tr>';});const tbBot=document.getElementById('tb-bot');tbBot.innerHTML='';(S.bot10.length?S.bot10:FB_BOT).forEach((w,i)=>{tbBot.innerHTML+='<tr><td style="color:var(--muted)">'+(i+1)+'</td><td><strong>'+w.ma+'</strong></td><td><span class="pill pr">'+w.kv+'</span></td><td class="tc"><span style="font-weight:700;color:'+(PC[w.ph.toLowerCase()]?.color||'#555')+'">'+w.ph+'</span></td><td class="tr2">'+fmt(w.sl)+'</td><td class="tr2"><strong style="color:var(--red)">'+w.nsbq.toFixed(1)+'</strong></td></tr>';});state.lastLoadTime=new Date();document.getElementById('lastUpdate').textContent='Cập nhật lần cuối: '+state.lastLoadTime.toLocaleString('vi-VN');}
+
+function setStatus(type,msg){const d=document.getElementById('connStatus').querySelector('.dot');const t=document.getElementById('stxt');d.className='dot '+{ok:'dok',warn:'dwarn',err:'derr',load:'dload'}[type];t.textContent=msg;}
+function updateBadges(){PHIENS.forEach(p=>{const el=document.getElementById('badge-'+p);let hasD=false;if(state.currentMode==='live')hasD=!!(state.liveData[p]&&state.liveData[p].length>0);else hasD=!!(state.historyData[state.currentMonth]?.[p]&&state.historyData[state.currentMonth][p].length>0);if(hasD)el.classList.add('connected');else el.classList.remove('connected');});}
+function switchView(v){document.querySelectorAll('.tabs:first-of-type .tab').forEach(t=>{t.classList.toggle('active',t.textContent.toLowerCase().includes(v==='all'?'tất cả':v));});}
+function showLoading(show){document.getElementById('loadingOverlay').classList.toggle('show',show);}
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function closeSetup(){document.getElementById('setup').classList.remove('show');}
+function autoConnect(){const hasURLs=PHIENS.some(p=>state.liveURLs[p]);if(hasURLs)refreshAll();else openModal('setup');}
+
+// Cache busting - always load fresh
+// Service Worker disabled for now - uncomment if needed
+// if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=3').then(r=>{console.log('SW registered');r.update();}).catch(e=>console.warn(e));});}
+let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;const btn=document.createElement('button');btn.className='btn-r';btn.textContent='📲 Cài App';btn.style.cssText='background:rgba(255,255,255,.25)';btn.onclick=async()=>{deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;if(outcome==='accepted')btn.remove();deferredPrompt=null;};document.querySelector('.hdr-r').prepend(btn);});
+init();
 </script>
 </body>
 </html>
