@@ -1,0 +1,8 @@
+{
+  "name": "CRCK2 Farm 2 Dashboard",
+  "description": "Dashboard khai thác mủ cao su – Đội 2 CRCK2 Aphivath. 4 phiên A/B/C/D, 322 công nhân, 8 khu vực.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

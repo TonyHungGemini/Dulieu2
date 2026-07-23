@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🌿 CRCK2 Aphivath – Farm 2 Dashboard</title>
-<link rel="manifest" href="manifest.json?v=3">
+<link rel="manifest" href="manifest.json?v=4">
 <meta name="theme-color" content="#2d6a4f">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CRCK2 Farm2">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
-<link rel="apple-touch-icon" href="icons/icon-192x192.png">
-<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512x512.png">
+<link rel="apple-touch-icon" href="icon-192x192.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152x152.png">
 <meta name="description" content="Dashboard khai thác mủ cao su – Đội 2 CRCK2 Aphivath. 4 phiên A/B/C/D, 322 công nhân, 8 khu vực.">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -189,19 +189,51 @@ tbody tr:hover{background:#f7fafc;}
 <!-- SETTINGS MODAL -->
 <div id="settingsModal" class="modal-overlay">
 <div class="modal">
-<div class="modal-hdr gold"><h2>⚙️ Cài Đặt Nguồn Dữ Liệu</h2><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
+<div class="modal-hdr gold"><h2>⚙️ Cài Đặt Nguồn Dữ Liệu Các Tháng</h2><button class="modal-close" onclick="closeModal('settingsModal')">✕</button></div>
 <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
 <div class="settings-section">
-<h3 style="font-size:14px;font-weight:700;margin-bottom:12px;">📊 Cấu Hình Tháng</h3>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+<h3 style="font-size:14px;font-weight:700;">📊 Cấu Hình Tháng</h3>
+<div style="display:flex;gap:6px;align-items:center;">
+<select id="newMonthM" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);font-size:12px;">
+<option value="01">Tháng 1</option><option value="02">Tháng 2</option><option value="03">Tháng 3</option><option value="04">Tháng 4</option>
+<option value="05">Tháng 5</option><option value="06">Tháng 6</option><option value="07">Tháng 7</option><option value="08">Tháng 8</option>
+<option value="09">Tháng 9</option><option value="10">Tháng 10</option><option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+</select>
+<select id="newMonthY" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);font-size:12px;">
+<option value="2026">2026</option><option value="2025">2025</option><option value="2027">2027</option>
+</select>
+<button class="btn btn-sm2 btn-primary" onclick="addNewMonth()">➕ Thêm Tháng</button>
+</div>
+</div>
 <div id="monthConfigs"></div>
-<button class="btn btn-primary" onclick="addNewMonth()" style="margin-top:10px;">➕ Thêm Tháng Mới</button>
 </div>
 <div class="settings-section">
-<div class="alert alert-info">1. Google Sheet → File → Share → "Publish to web"<br>2. Chọn tab → CSV → Publish<br>3. Dán URL → Lưu</div>
+<div class="alert alert-info">💡 <strong>Hướng dẫn dán link Google Sheet:</strong><br>Bạn có thể dán trực tiếp link Google Sheet (dạng <code>.../edit</code> hoặc Publish CSV). Hệ thống sẽ tự động chuyển đổi thành link CSV hợp lệ.</div>
 </div></div>
-<div class="modal-footer">
+<div class="modal-footer" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
+<button class="btn btn-sm2 btn-secondary" onclick="resetAppData()" style="color:#e53e3e;border-color:#feb2b2;background:#fff5f5;">🗑️ Reset Data & Cache</button>
+<div style="display:flex;gap:8px;">
 <button class="btn btn-secondary" onclick="closeModal('settingsModal')">Đóng</button>
-<button class="btn btn-primary" onclick="saveAllMonths()">💾 Lưu Tất Cả</button>
+<button class="btn btn-primary" onclick="saveAllMonths()">💾 Lưu Tất Cả & Cập Nhật</button>
+</div></div></div>
+
+<!-- PWA INSTALL MODAL -->
+<div id="pwaModal" class="modal-overlay">
+<div class="modal">
+<div class="modal-hdr" style="background:linear-gradient(135deg,#065f46,#059669);"><h2>📲 Cài Đặt Ứng Dụng (PWA)</h2><button class="modal-close" onclick="closeModal('pwaModal')">✕</button></div>
+<div class="modal-body">
+<div style="text-align:center;margin-bottom:16px;">
+<img src="icon-192x192.png" alt="CRCK2 Logo" style="width:72px;height:72px;border-radius:16px;box-shadow:0 4px 12px rgba(0,0,0,0.15);margin-bottom:8px;">
+<h3 style="font-size:16px;font-weight:700;">CRCK2 Farm2 Dashboard</h3>
+<p style="font-size:12px;color:var(--muted);margin-top:2px;">Cài đặt ứng dụng trực tiếp lên màn hình chính máy tính hoặc điện thoại</p>
+</div>
+<div id="pwaInstructions" style="font-size:13px;line-height:1.6;background:#f7fafc;padding:14px;border-radius:8px;border:1px solid var(--border);">
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="closeModal('pwaModal')">Đóng</button>
+<button class="btn btn-primary" id="pwaTriggerActionBtn" onclick="triggerPwaInstall()">📲 Cài Đặt Ngay</button>
 </div></div></div>
 
 <!-- HEADER -->
@@ -211,7 +243,8 @@ tbody tr:hover{background:#f7fafc;}
 <p>4 Phiên A/B/C/D · Tự cập nhật mỗi 5 phút</p>
 </div>
 <div class="hdr-r">
-<div id="currentMonthLabel" class="live">📍 Live: Tháng Hiện Tại</div>
+<button class="btn-r" id="btnPwaHeader" style="background:linear-gradient(135deg,#059669,#10b981);font-weight:700;" onclick="openPwaInstallModal()">📲 Cài App</button>
+<div id="currentMonthLabel" class="live" onclick="openHistoryModal()" style="cursor:pointer;" title="Nhấn để mở lịch sử chọn tháng">📍 Live: Tháng Hiện Tại</div>
 <div id="connStatus" class="status"><span class="dot dload"></span><span id="stxt">Đang khởi động...</span></div>
 <div id="phienBadges" class="phien-badges">
 <span class="pb pa" id="badge-a">A</span>
@@ -219,8 +252,8 @@ tbody tr:hover{background:#f7fafc;}
 <span class="pb pc" id="badge-c">C</span>
 <span class="pb pd2" id="badge-d">D</span>
 </div>
-<button class="btn-r" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);" onclick="openModal('settingsModal')">⚙️ Cài Đặt</button>
-<button class="btn-history" onclick="openModal('historyModal')">📅 Lịch Sử</button>
+<button class="btn-r" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);" onclick="openSettingsModal()">⚙️ Cài Đặt</button>
+<button class="btn-history" onclick="openHistoryModal()">📅 Lịch Sử</button>
 <button class="btn-r" onclick="openModal('setup')">🔗 Kết Nối</button>
 <button class="btn-r" onclick="refreshAll()">🔄 Cập Nhật</button>
 </div>
@@ -299,72 +332,434 @@ const FB_BOT=[{ma:'Đ2-KV8-37',kv:'KV8',ph:'A',sl:203,nsbq:33.8},{ma:'Đ2-KV8-38
 
 let state={currentMode:'live',currentMonth:null,liveURLs:{a:'',b:'',c:'',d:''},liveData:{a:null,b:null,c:null,d:null},historyData:{},monthConfigs:{},charts:{},lastLoadTime:null};
 
-function init(){loadFromStorage();PHIENS.forEach(p=>{if(!state.liveURLs[p])state.liveURLs[p]=localStorage.getItem('url_'+p)||DEFAULT_LIVE_URLS[p];document.getElementById('u'+p).value=state.liveURLs[p];});setStatus('warn','Nhấn ↻ để tải dữ liệu');renderAll();setInterval(()=>{if(state.currentMode==='live'&&PHIENS.some(p=>state.liveURLs[p]))refreshAll();},5*60*1000);}
+function cleanGoogleSheetUrl(url){
+  if(!url||typeof url!=='string')return'';
+  let u=url.trim();
+  if(!u)return'';
+  let gid='';
+  const gidMatch=u.match(/[?&#]gid=(\d+)/);
+  if(gidMatch)gid=gidMatch[1];
+  
+  if(u.includes('/spreadsheets/d/e/')){
+    if(u.includes('/pubhtml')||u.includes('/pub')){
+      u=u.replace(/\/pubhtml.*|\/pub\?.*/,'/pub')+'?output=csv';
+      if(gid)u+='&gid='+gid;
+      return u;
+    }
+    if(!u.includes('output=csv')){
+      u+=(u.includes('?')?'&':'?')+'output=csv';
+    }
+    return u;
+  }
+  
+  const docIdMatch=u.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if(docIdMatch){
+    const id=docIdMatch[1];
+    let exportUrl='https://docs.google.com/spreadsheets/d/'+id+'/export?format=csv';
+    if(gid)exportUrl+='&gid='+gid;
+    return exportUrl;
+  }
+  return u;
+}
+
+function init(){
+  loadFromStorage();
+  initConfigs();
+  renderHistoryList();
+  renderSettings();
+  const liveKey=Object.keys(state.monthConfigs).find(k=>state.monthConfigs[k].isLive)||Object.keys(state.monthConfigs).sort().reverse()[0];
+  if(liveKey && state.monthConfigs[liveKey]){
+    PHIENS.forEach(p=>{
+      if(state.monthConfigs[liveKey].urls[p])state.liveURLs[p]=state.monthConfigs[liveKey].urls[p];
+    });
+  }
+  PHIENS.forEach(p=>{
+    if(!state.liveURLs[p])state.liveURLs[p]=localStorage.getItem('url_'+p)||DEFAULT_LIVE_URLS[p];
+    const inp=document.getElementById('u'+p);
+    if(inp)inp.value=state.liveURLs[p];
+  });
+  setStatus('warn','Nhấn ↻ để tải dữ liệu');
+  updateMonthLabel();
+  renderAll();
+  refreshAll();
+  setInterval(()=>{if(state.currentMode==='live'&&PHIENS.some(p=>state.liveURLs[p]))refreshAll();},5*60*1000);
+}
+
 function loadFromStorage(){try{const s=localStorage.getItem('dashboardState');if(s){const p=JSON.parse(s);state.liveURLs=p.liveURLs||state.liveURLs;state.monthConfigs=p.monthConfigs||{};state.currentMonth=p.currentMonth;state.currentMode=p.currentMode||'live';}}catch(e){}}
 function saveToStorage(){try{localStorage.setItem('dashboardState',JSON.stringify({liveURLs:state.liveURLs,monthConfigs:state.monthConfigs,currentMonth:state.currentMonth,currentMode:state.currentMode}));}catch(e){}}
 
-function csvLine(line){const r=[],c='';let q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c.trim());c='';}else{c+=ch;}}r.push(c.trim());return r;}
-function getKV(s){const m=String(s).match(/KV(\d+)/i);return m?'KV'+m[1]:'';}
-function parseCSV(txt,pl){const ws=[];const ls=txt.split('\n');for(const l of ls){if(!l.trim())continue;const cs=csvLine(l);const stt=parseFloat(cs[0]);if(!stt||isNaN(stt)||stt<=0||stt>1000)continue;const maTo=cs[1]||'',maCN=cs[2]||'';const kv=getKV(maTo)||getKV(maCN);if(!kv)continue;let sl=0,nhat=0;const s100=parseFloat(cs[100]),n100=parseFloat(cs[102]);if(s100>0&&!isNaN(s100)){sl=s100;nhat=isNaN(n100)?0:n100;}else{for(let j=8;j<Math.min(cs.length-2,101);j+=3){const ds=parseFloat(cs[j]),dn=parseFloat(cs[j+1]);if(ds>0&&!isNaN(ds)){sl+=ds;if(!isNaN(dn))nhat+=dn;}}}const nsbq=nhat>0?sl/nhat:0;ws.push({maTo,maCN,kv,sl,nhat,nsbq,phien:pl.toUpperCase()});}return ws;}
+function csvLine(line){
+  let sep=',';
+  if(!line.includes(',')&&line.includes(';'))sep=';';
+  else if(!line.includes(',')&&line.includes('\t'))sep='\t';
+  const r=[];let c='';let q=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='"'){q=!q;}
+    else if(ch===sep&&!q){r.push(c.trim().replace(/^"|"$/g,''));c='';}
+    else{c+=ch;}
+  }
+  r.push(c.trim().replace(/^"|"$/g,''));
+  return r;
+}
+
+function getKV(s){
+  if(!s)return'';
+  const m=String(s).match(/(?:KV|Khu\s*vực|K)\s*(\d+)/i);
+  return m?'KV'+m[1]:'';
+}
+
+function parseCSV(txt,pl){
+  const ws=[];
+  const ls=txt.split(/\r?\n/);
+  for(const l of ls){
+    if(!l.trim())continue;
+    const cs=csvLine(l);
+    const stt=parseFloat(cs[0]);
+    if(!stt||isNaN(stt)||stt<=0||stt>1000)continue;
+    const maTo=cs[1]||'',maCN=cs[2]||'';
+    const kv=getKV(maTo)||getKV(maCN);
+    if(!kv)continue;
+    let sl=0,nhat=0;
+    const s100=parseFloat(cs[100]),n100=parseFloat(cs[102]);
+    if(s100>0&&!isNaN(s100)){
+      sl=s100;nhat=isNaN(n100)?0:n100;
+    }else{
+      for(let j=8;j<Math.min(cs.length-2,101);j+=3){
+        const ds=parseFloat(cs[j]),dn=parseFloat(cs[j+1]);
+        if(ds>0&&!isNaN(ds)){sl+=ds;if(!isNaN(dn))nhat+=dn;}
+      }
+    }
+    const nsbq=nhat>0?sl/nhat:0;
+    ws.push({maTo,maCN,kv,sl,nhat,nsbq,phien:pl.toUpperCase()});
+  }
+  return ws;
+}
 
 let fetchErrors={a:'',b:'',c:'',d:''};
-// Try direct fetch first - works for published CSV URLs
+
 async function fetchCSV_Direct(url,phien){
-  console.log('Trying direct fetch for',phien,url);
   try{
-    // Try with no-cors first (might work for Google Sheets)
     const r1=await fetch(url,{method:'GET',mode:'no-cors'});
     if(r1.ok || r1.type==='opaque'){
       const t=await r1.text();
-      console.log('no-cors response:',t.substring(0,200));
       if(t&&t.trim().length>10){fetchErrors[phien]='';return t;}
     }
-  }catch(e){console.log('Direct fetch error:',e);}
-  // Try regular cors
+  }catch(e){}
   try{
     const r=await fetch(url);
-    if(r.ok){const t=await r.text();if(t&&t.trim().length>10){fetchErrors[phien]='';console.log('CORS fetch OK for',phien);return t;}}
-  }catch(e){console.log('CORS fetch failed:',e);}
+    if(r.ok){const t=await r.text();if(t&&t.trim().length>10){fetchErrors[phien]='';return t;}}
+  }catch(e){}
   return null;
 }
-async function fetchCSV(url,phien){
-  if(!url||!url.trim())return null;
-  console.log('fetchCSV called for',phien,url);
-  // Method 1: Try direct fetch (works for published CSV URLs)
+
+async function fetchCSV(rawUrl,phien){
+  if(!rawUrl||!rawUrl.trim())return null;
+  const url=cleanGoogleSheetUrl(rawUrl);
   const data=await fetchCSV_Direct(url,phien);
   if(data)return data;
-  // Method 2: Try through allorigins proxy
+  try{
+    const localProxyUrl='/api/proxy?url='+encodeURIComponent(url);
+    const r=await fetch(localProxyUrl);
+    if(r.ok){const t=await r.text();if(t&&t.trim().length>10){fetchErrors[phien]='';return t;}}
+  }catch(e){}
   try{
     const proxyUrl='https://api.allorigins.win/raw?url='+encodeURIComponent(url);
     const r=await fetch(proxyUrl);
     if(r.ok){const t=await r.text();if(t&&t.trim().length>10){fetchErrors[phien]='';return t;}}
-  }catch(e){console.log('Proxy failed',e);}
+  }catch(e){}
   fetchErrors[phien]='All methods failed';
   return null;
 }
+
 async function loadSession(session,url,target){const txt=await fetchCSV(url,session);if(txt){target[session]=parseCSV(txt,session);return true;}return false;}
 
-async function testConnection(session){const url=document.getElementById('u'+session).value.trim();if(!url)return;showLoading(true);const txt=await fetchCSV(url);showLoading(false);if(txt){const d=parseCSV(txt,session);alert('✅ '+d.length+' records');}else{alert('❌ Không tải được.');}}
-async function testAllConnections(){showLoading(true);let c=0;for(const p of PHIENS){const url=document.getElementById('u'+p).value.trim();if(url){state.liveURLs[p]=url;localStorage.setItem('url_'+p,url);if(await loadSession(p,url,state.liveData))c++;}}showLoading(false);if(c>0){updateBadges();renderAll();saveToStorage();closeSetup();}return c;}
-async function refreshAll(){showLoading(true);let c=0;let errMsg='';for(const p of PHIENS){if(state.liveURLs[p]){if(await loadSession(p,state.liveURLs[p],state.liveData))c++;if(fetchErrors[p])errMsg+=PC[p].label+': '+fetchErrors[p]+'\n';}}showLoading(false);if(c>0||state.currentMode==='history'){updateBadges();renderAll();}if(errMsg){setStatus('err',errMsg);}return c;}
+async function testConnection(session){
+  const urlInput=document.getElementById('u'+session).value.trim();
+  if(!urlInput)return;
+  const url=cleanGoogleSheetUrl(urlInput);
+  showLoading(true);
+  const txt=await fetchCSV(url,session);
+  showLoading(false);
+  if(txt){
+    const d=parseCSV(txt,session);
+    alert('✅ Kết nối thành công Phiên '+session.toUpperCase()+': Tải được '+d.length+' dòng dữ liệu.');
+  }else{
+    alert('❌ Không tải được. Vui lòng kiểm tra lại đường dẫn Google Sheet.');
+  }
+}
+
+async function testAllConnections(){
+  showLoading(true);
+  let c=0;
+  for(const p of PHIENS){
+    const raw=document.getElementById('u'+p).value.trim();
+    if(raw){
+      const url=cleanGoogleSheetUrl(raw);
+      state.liveURLs[p]=url;
+      localStorage.setItem('url_'+p,url);
+      if(await loadSession(p,url,state.liveData))c++;
+    }
+  }
+  showLoading(false);
+  if(c>0){updateBadges();renderAll();saveToStorage();closeSetup();}
+  return c;
+}
+
+async function refreshAll(){
+  showLoading(true);
+  let c=0;
+  let errMsg='';
+  if(state.currentMode==='live'){
+    for(const p of PHIENS){
+      if(state.liveURLs[p]){
+        if(await loadSession(p,state.liveURLs[p],state.liveData))c++;
+        if(fetchErrors[p])errMsg+=PC[p].label+': '+fetchErrors[p]+'\n';
+      }
+    }
+  }else if(state.currentMode==='history'&&state.currentMonth){
+    const cfg=state.monthConfigs[state.currentMonth];
+    if(cfg){
+      if(!state.historyData[state.currentMonth])state.historyData[state.currentMonth]={a:null,b:null,c:null,d:null};
+      for(const p of PHIENS){
+        if(cfg.urls[p]){
+          if(await loadSession(p,cfg.urls[p],state.historyData[state.currentMonth]))c++;
+          if(fetchErrors[p])errMsg+=PC[p].label+': '+fetchErrors[p]+'\n';
+        }
+      }
+    }
+  }
+  showLoading(false);
+  updateBadges();
+  renderAll();
+  if(errMsg){
+    setStatus('err','Một số phiên lỗi');
+  }else if(c>0){
+    setStatus('ok',c+'/4 phiên kết nối ✅');
+  }else{
+    setStatus('warn','Chưa có dữ liệu');
+  }
+  return c;
+}
 
 function getMonthName(key){const [y,m]=key.split('-');const months=['Giêng','Hai','Ba','Tư','Năm','Sáu','Bảy','Tám','Chín','Mười','Mười Một','Mười Hai'];return'Tháng '+months[parseInt(m)-1]+' '+y;}
-function getDefaultConfigs(){const now=new Date();const cur=now.toISOString().slice(0,7);return{[cur]:{name:getMonthName(cur),isLive:true,urls:{...DEFAULT_LIVE_URLS}},['2026-06']:{name:'Tháng 6/2026',isLive:false,urls:{a:'',b:'',c:'',d:''}}};}
-function initConfigs(){if(Object.keys(state.monthConfigs).length===0){state.monthConfigs=getDefaultConfigs();saveToStorage();}}
+function getDefaultConfigs(){const now=new Date();const cur=now.toISOString().slice(0,7);return{[cur]:{name:'Tháng '+(now.getMonth()+1)+'/'+now.getFullYear(),isLive:true,urls:{...DEFAULT_LIVE_URLS}},'2026-06':{name:'Tháng 6/2026',isLive:false,urls:{a:'',b:'',c:'',d:''}},'2026-05':{name:'Tháng 5/2026',isLive:false,urls:{a:'',b:'',c:'',d:''}}};}
+function initConfigs(){
+  if(!state.monthConfigs || typeof state.monthConfigs !== 'object' || Object.keys(state.monthConfigs).length===0){
+    state.monthConfigs=getDefaultConfigs();
+    saveToStorage();
+  }else{
+    const keys=Object.keys(state.monthConfigs);
+    if(keys.length===0){
+      state.monthConfigs=getDefaultConfigs();
+      saveToStorage();
+    }else{
+      keys.forEach(k=>{
+        if(!state.monthConfigs[k]||typeof state.monthConfigs[k]!=='object')state.monthConfigs[k]={name:'Tháng '+k,isLive:false,urls:{a:'',b:'',c:'',d:''}};
+        if(!state.monthConfigs[k].urls)state.monthConfigs[k].urls={a:'',b:'',c:'',d:''};
+        if(!state.monthConfigs[k].name)state.monthConfigs[k].name='Tháng '+k;
+      });
+    }
+  }
+}
 function openHistoryModal(){initConfigs();renderHistoryList();openModal('historyModal');}
 
-function renderHistoryList(){const c=document.getElementById('historyList');const ms=Object.keys(state.monthConfigs).sort().reverse();if(ms.length===0){c.innerHTML='<div class="alert alert-info">Chưa có dữ liệu.</div>';return;}c.innerHTML=ms.map(k=>{const cfg=state.monthConfigs[k];const isAct=state.currentMonth===k&&state.currentMode==='history';const conn=PHIENS.filter(p=>cfg.urls[p]&&state.historyData[k]?.[p]).length;const tot=PHIENS.filter(p=>cfg.urls[p]).length;const isLive=cfg.isLive&&k===ms[0];return'<div class="history-item '+(isAct?'active':'')+'" onclick="selectMonth(\''+k+'\')"><div><div class="hi-month">'+cfg.name+'</div>'+(isLive?'<span class="pill pg" style="font-size:10px">Live</span>':'')+'<div class="hi-sessions">'+PHIENS.map(p=>{const hasD=!!state.historyData[k]?.[p];return'<span class="sb" style="background:'+(hasD?PC[p].color:'#e2e8f0')+'">'+p.toUpperCase()+'</span>';}).join('')+'</div></div><div class="hi-status">'+(tot>0?conn+'/'+tot+' phiên':'Chưa cấu hình')+'</div></div>';}).join('');}
+function renderHistoryList(){
+  const c=document.getElementById('historyList');
+  if(!c)return;
+  initConfigs();
+  let ms=Object.keys(state.monthConfigs||{}).sort().reverse();
+  if(ms.length===0){
+    state.monthConfigs=getDefaultConfigs();
+    saveToStorage();
+    ms=Object.keys(state.monthConfigs).sort().reverse();
+  }
+  
+  let html=ms.map(k=>{
+    const cfg=state.monthConfigs[k]||{};
+    const urls=cfg.urls||{a:'',b:'',c:'',d:''};
+    const name=cfg.name||('Tháng '+k);
+    const isAct=(state.currentMonth===k && state.currentMode==='history') || (cfg.isLive && state.currentMode==='live');
+    const conn=PHIENS.filter(p=>urls[p] && (state.historyData[k]?.[p] || (cfg.isLive && state.liveData[p]))).length;
+    const tot=PHIENS.filter(p=>urls[p]).length;
+    
+    return '<div class="history-item '+(isAct?'active':'')+'" onclick="selectMonth(\''+k+'\')" style="background:'+(isAct?'#f0fdf4':'#ffffff')+';border:1px solid '+(isAct?'#22c55e':'#cbd5e1')+';padding:12px;border-radius:10px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+      +'<div>'
+      +'<div style="font-size:14px;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:6px;">'
+      +name+(cfg.isLive?' <span class="pill pg" style="font-size:10px;background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:10px;font-weight:700;">LIVE</span>':'')
+      +'</div>'
+      +'<div style="display:flex;gap:4px;margin-top:6px;">'
+      +PHIENS.map(p=>{
+        const hasD=!!(state.historyData[k]?.[p] || (cfg.isLive && state.liveData[p]));
+        const col=(PC[p] && PC[p].color)?PC[p].color:'#3b82f6';
+        return '<span style="background:'+(hasD?col:'#e2e8f0')+';color:'+(hasD?'#ffffff':'#64748b')+';padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;">'+p.toUpperCase()+'</span>';
+      }).join('')
+      +'</div>'
+      +'</div>'
+      +'<div style="font-size:12px;font-weight:600;color:'+(tot>0?'#16a34a':'#94a3b8')+';">'
+      +(tot>0?conn+'/'+tot+' phiên':'Chưa dán link')
+      +'</div>'
+      +'</div>';
+  }).join('');
 
-async function selectMonth(key){const cfg=state.monthConfigs[key];if(!cfg)return;if(cfg.isLive&&key===Object.keys(state.monthConfigs).sort().reverse()[0]){state.currentMode='live';state.currentMonth=key;closeModal('historyModal');updateMonthLabel();renderAll();saveToStorage();return;}showLoading(true);state.currentMode='history';state.currentMonth=key;if(!state.historyData[key])state.historyData[key]={a:null,b:null,c:null,d:null};for(const p of PHIENS){if(cfg.urls[p])await loadSession(p,cfg.urls[p],state.historyData[key]);}showLoading(false);updateMonthLabel();renderAll();saveToStorage();renderHistoryList();closeModal('historyModal');}
+  html+='<div style="margin-top:12px;text-align:center;">'
+    +'<button class="btn btn-sm2 btn-primary" onclick="openSettingsModal()" style="padding:8px 16px;font-size:12px;background:#2563eb;color:#fff;border-radius:8px;border:none;cursor:pointer;">⚙️ Cấu Hình Link Google Sheet Các Tháng</button>'
+    +'</div>';
 
-function updateMonthLabel(){const el=document.getElementById('currentMonthLabel');if(state.currentMode==='live'){const liveKey=Object.keys(state.monthConfigs).sort().reverse()[0];const cfg=state.monthConfigs[liveKey];el.className='live';el.innerHTML='📍 Live: '+(cfg?.name||'Tháng Hiện Tại');}else{const cfg=state.monthConfigs[state.currentMonth];el.className='hist';el.innerHTML='📜 '+(cfg?.name||state.currentMonth)+' – Lịch Sử';}}
+  c.innerHTML=html;
+}
+
+async function selectMonth(key){
+  const cfg=state.monthConfigs[key];
+  if(!cfg)return;
+  showLoading(true);
+  state.currentMonth=key;
+  if(cfg.isLive){
+    state.currentMode='live';
+    for(const p of PHIENS){
+      if(state.liveURLs[p])await loadSession(p,state.liveURLs[p],state.liveData);
+    }
+  }else{
+    state.currentMode='history';
+    if(!state.historyData[key])state.historyData[key]={a:null,b:null,c:null,d:null};
+    for(const p of PHIENS){
+      if(cfg.urls[p])await loadSession(p,cfg.urls[p],state.historyData[key]);
+    }
+  }
+  showLoading(false);
+  updateMonthLabel();
+  renderAll();
+  saveToStorage();
+  renderHistoryList();
+  closeModal('historyModal');
+}
+
+function updateMonthLabel(){
+  const el=document.getElementById('currentMonthLabel');
+  if(state.currentMode==='live'){
+    const liveKey=Object.keys(state.monthConfigs).find(k=>state.monthConfigs[k].isLive)||Object.keys(state.monthConfigs).sort().reverse()[0];
+    const cfg=state.monthConfigs[liveKey];
+    el.className='live';
+    el.innerHTML='📍 Live: '+(cfg?.name||'Tháng Hiện Tại');
+  }else{
+    const cfg=state.monthConfigs[state.currentMonth];
+    el.className='hist';
+    el.innerHTML='📜 '+(cfg?.name||state.currentMonth)+' – Lịch Sử';
+  }
+}
 
 function openSettingsModal(){initConfigs();renderSettings();openModal('settingsModal');}
-function renderSettings(){const c=document.getElementById('monthConfigs');const ms=Object.keys(state.monthConfigs).sort().reverse();c.innerHTML=ms.map(k=>{const cfg=state.monthConfigs[k];return'<div class="month-editor"><h4>'+cfg.name+(cfg.isLive?'<span class="pill pg" style="font-size:10px">LIVE</span>':'')+'<button class="btn btn-sm2 btn-secondary" onclick="removeMonth(\''+k+'\')" '+(cfg.isLive?'disabled':'')+'>🗑️</button></h4><div class="month-sessions">'+PHIENS.map(p=>'<div class="msession"><label style="color:'+PC[p].color+'">'+PC[p].label+'</label><input type="text" id="cfg-'+k+'-'+p+'" value="'+(cfg.urls[p]||'')+'" placeholder="https://docs.google.com/...csv"></div>').join('')+'</div><div class="settings-actions"><button class="btn btn-sm2 btn-primary" onclick="saveMonth(\''+k+'\')">💾 Lưu</button></div></div>';}).join('');}
-function addNewMonth(){const now=new Date();const y=now.getFullYear(),m=now.getMonth()+1;const k=y+'-'+String(m).padStart(2,'0');if(state.monthConfigs[k]){alert('Tháng này đã tồn tại');return;}state.monthConfigs[k]={name:getMonthName(k),isLive:false,urls:{a:'',b:'',c:'',d:''}};saveToStorage();renderSettings();}
-function removeMonth(key){if(!state.monthConfigs[key]||state.monthConfigs[key].isLive)return;if(confirm('Xóa '+state.monthConfigs[key].name+'?')){delete state.monthConfigs[key];delete state.historyData[key];saveToStorage();renderSettings();renderHistoryList();}}
-function saveMonth(key){if(!state.monthConfigs[key])return;PHIENS.forEach(p=>{state.monthConfigs[key].urls[p]=document.getElementById('cfg-'+key+'-'+p).value.trim();});saveToStorage();renderHistoryList();}
-function saveAllMonths(){document.querySelectorAll('.month-editor').forEach(ed=>{const k=ed.id.replace('month-editor-','');if(state.monthConfigs[k])PHIENS.forEach(p=>{const inp=document.getElementById('cfg-'+k+'-'+p);if(inp)state.monthConfigs[k].urls[p]=inp.value.trim();});});saveToStorage();renderHistoryList();closeModal('settingsModal');}
+
+function renderSettings(){
+  const c=document.getElementById('monthConfigs');
+  const ms=Object.keys(state.monthConfigs).sort().reverse();
+  c.innerHTML=ms.map(k=>{
+    const cfg=state.monthConfigs[k];
+    return '<div class="month-editor" id="month-editor-'+k+'"><h4><span>'+cfg.name+(cfg.isLive?' <span class="pill pg" style="font-size:10px">LIVE</span>':'')+'</span><div style="display:flex;gap:4px;"><button class="btn btn-sm2 btn-secondary" onclick="setLiveMonth(\''+k+'\')" '+(cfg.isLive?'disabled':'')+'>📍 Đặt Live</button><button class="btn btn-sm2 btn-secondary" onclick="removeMonth(\''+k+'\')" '+(cfg.isLive?'disabled':'')+'>🗑️</button></div></h4><div class="month-sessions">'+PHIENS.map(p=>'<div class="msession"><label style="color:'+PC[p].color+'">'+PC[p].label+'</label><input type="text" id="cfg-'+k+'-'+p+'" value="'+(cfg.urls[p]||'')+'" placeholder="https://docs.google.com/...csv"></div>').join('')+'</div><div class="settings-actions"><button class="btn btn-sm2 btn-primary" onclick="saveMonth(\''+k+'\')">💾 Lưu Tháng Này</button></div></div>';
+  }).join('');
+}
+
+function addNewMonth(){
+  const mSelect=document.getElementById('newMonthM');
+  const ySelect=document.getElementById('newMonthY');
+  const m=mSelect?mSelect.value:'01';
+  const y=ySelect?ySelect.value:'2026';
+  const k=y+'-'+m;
+  if(state.monthConfigs[k]){
+    alert('Tháng '+m+'/'+y+' đã tồn tại trong cấu hình.');
+    return;
+  }
+  state.monthConfigs[k]={name:'Tháng '+m+'/'+y,isLive:false,urls:{a:'',b:'',c:'',d:''}};
+  saveToStorage();
+  renderSettings();
+  renderHistoryList();
+}
+
+function setLiveMonth(key){
+  if(!state.monthConfigs[key])return;
+  Object.keys(state.monthConfigs).forEach(k=>{
+    state.monthConfigs[k].isLive=(k===key);
+  });
+  state.currentMode='live';
+  state.currentMonth=key;
+  PHIENS.forEach(p=>{
+    state.liveURLs[p]=state.monthConfigs[key].urls[p]||'';
+    const inp=document.getElementById('u'+p);
+    if(inp)inp.value=state.liveURLs[p];
+  });
+  saveToStorage();
+  renderSettings();
+  renderHistoryList();
+  updateMonthLabel();
+  refreshAll();
+}
+
+function removeMonth(key){
+  if(!state.monthConfigs[key]||state.monthConfigs[key].isLive)return;
+  if(confirm('Xóa '+state.monthConfigs[key].name+'?')){
+    delete state.monthConfigs[key];
+    delete state.historyData[key];
+    saveToStorage();
+    renderSettings();
+    renderHistoryList();
+  }
+}
+
+function saveMonth(key){
+  if(!state.monthConfigs[key])return;
+  PHIENS.forEach(p=>{
+    const inp=document.getElementById('cfg-'+key+'-'+p);
+    if(inp){
+      const cleaned=cleanGoogleSheetUrl(inp.value.trim());
+      state.monthConfigs[key].urls[p]=cleaned;
+      inp.value=cleaned;
+      if(state.monthConfigs[key].isLive){
+        state.liveURLs[p]=cleaned;
+      }
+    }
+  });
+  saveToStorage();
+  renderHistoryList();
+  alert('✅ Đã lưu cấu hình '+state.monthConfigs[key].name);
+  refreshAll();
+}
+
+function saveAllMonths(){
+  Object.keys(state.monthConfigs).forEach(k=>{
+    PHIENS.forEach(p=>{
+      const inp=document.getElementById('cfg-'+k+'-'+p);
+      if(inp){
+        const cleaned=cleanGoogleSheetUrl(inp.value.trim());
+        state.monthConfigs[k].urls[p]=cleaned;
+        if(state.monthConfigs[k].isLive){
+          state.liveURLs[p]=cleaned;
+        }
+      }
+    });
+  });
+  saveToStorage();
+  renderHistoryList();
+  closeModal('settingsModal');
+  refreshAll();
+}
+
+function resetAppData(){
+  if(confirm('Bạn có chắc chắn muốn xóa bộ nhớ tạm (Cache) và khôi phục cài đặt gốc?')){
+    localStorage.clear();
+    if('caches' in window){
+      caches.keys().then(names => {
+        for (let name of names) caches.delete(name);
+      });
+    }
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        for(let reg of regs) reg.unregister();
+      });
+    }
+    alert('Đã xóa bộ nhớ tạm! Trang web sẽ tự động tải lại.');
+    location.reload();
+  }
+}
 
 function buildSummary(pw){const allW=Object.values(pw).flat();const kvSet=new Set(allW.map(w=>w.kv).filter(Boolean));const kvs=Array.from(kvSet).sort((a,b)=>parseInt(a.replace('KV',''))-parseInt(b.replace('KV','')));if(kvs.length===0)kvs.push(...FALLBACK_KVS);const pp={};PHIENS.forEach(p=>{const ws=pw[p]||[];const kd={};for(const kv of kvs){const wk=ws.filter(w=>w.kv===kv);const tSL=wk.reduce((s,w)=>s+w.sl,0);const tNhat=wk.reduce((s,w)=>s+w.nhat,0);const nsbqs=wk.filter(w=>w.nsbq>0).map(w=>w.nsbq);kd[kv]={sl:Math.round(tSL),nhat:Math.round(tNhat),nsbq:tNhat>0?tSL/tNhat:0,nsbqAvg:nsbqs.length?nsbqs.reduce((s,v)=>s+v,0)/nsbqs.length:0,cn:wk.length};}const wAll=ws.filter(w=>w.nsbq>0);pp[p]={kdata:kd,totalSL:ws.reduce((s,w)=>s+w.sl,0),totalNhat:ws.reduce((s,w)=>s+w.nhat,0),nsbqTB:ws.reduce((s,w)=>s+w.nhat,0)>0?ws.reduce((s,w)=>s+w.sl,0)/ws.reduce((s,w)=>s+w.nhat,0):0,nsbqMax:wAll.length?Math.max(...wAll.map(w=>w.nsbq)):0,nsbqMin:wAll.length?Math.min(...wAll.map(w=>w.nsbq)):0,cn:ws.length};});const nsbq_all={},sl_all={},nhat_all={},nsbq_min={},nsbq_max={},cn_kv={};for(const kv of kvs){const allKV=allW.filter(w=>w.kv===kv&&w.nsbq>0);sl_all[kv]=PHIENS.reduce((s,p)=>s+(pp[p].kdata[kv]?.sl||0),0);nhat_all[kv]=PHIENS.reduce((s,p)=>s+(pp[p].kdata[kv]?.nhat||0),0);nsbq_all[kv]=nhat_all[kv]>0?sl_all[kv]/nhat_all[kv]:0;nsbq_min[kv]=allKV.length?Math.min(...allKV.map(w=>w.nsbq)):0;nsbq_max[kv]=allKV.length?Math.max(...allKV.map(w=>w.nsbq)):0;cn_kv[kv]=Math.max(...PHIENS.map(p=>pp[p].kdata[kv]?.cn||0));}const dist=[0,0,0,0,0];for(const w of allW.filter(w=>w.nsbq>0)){const bins=[40,60,80,100,99999];for(let i=0;i<bins.length;i++){if(w.nsbq<bins[i]){dist[i]++;break;}}}const top10=[...allW].sort((a,b)=>b.nsbq-a.nsbq).slice(0,10).map(w=>({ma:w.maCN,kv:w.kv,ph:w.phien,sl:Math.round(w.sl),nsbq:+w.nsbq.toFixed(1)}));const bot10=[...allW.filter(w=>w.nsbq>0)].sort((a,b)=>a.nsbq-b.nsbq).slice(0,10).map(w=>({ma:w.maCN,kv:w.kv,ph:w.phien,sl:Math.round(w.sl),nsbq:+w.nsbq.toFixed(1)}));const gSL=PHIENS.reduce((s,p)=>s+pp[p].totalSL,0);const gNhat=PHIENS.reduce((s,p)=>s+pp[p].totalNhat,0);return{kvs,perPhien:pp,nsbq_all,sl_all,nhat_all,nsbq_min,nsbq_max,cn_kv,dist,top10,bot10,grandSL:gSL,grandNhat:gNhat,grandNSBQ:gNhat>0?gSL/gNhat:0};}
 
@@ -383,15 +778,92 @@ function setStatus(type,msg){const d=document.getElementById('connStatus').query
 function updateBadges(){PHIENS.forEach(p=>{const el=document.getElementById('badge-'+p);let hasD=false;if(state.currentMode==='live')hasD=!!(state.liveData[p]&&state.liveData[p].length>0);else hasD=!!(state.historyData[state.currentMonth]?.[p]&&state.historyData[state.currentMonth][p].length>0);if(hasD)el.classList.add('connected');else el.classList.remove('connected');});}
 function switchView(v){document.querySelectorAll('.tabs:first-of-type .tab').forEach(t=>{t.classList.toggle('active',t.textContent.toLowerCase().includes(v==='all'?'tất cả':v));});}
 function showLoading(show){document.getElementById('loadingOverlay').classList.toggle('show',show);}
-function openModal(id){document.getElementById(id).classList.add('show');}
+function openModal(id){
+  initConfigs();
+  if(id==='historyModal')renderHistoryList();
+  if(id==='settingsModal')renderSettings();
+  const el=document.getElementById(id);
+  if(el)el.classList.add('show');
+}
 function closeModal(id){document.getElementById(id).classList.remove('show');}
 function closeSetup(){document.getElementById('setup').classList.remove('show');}
 function autoConnect(){const hasURLs=PHIENS.some(p=>state.liveURLs[p]);if(hasURLs)refreshAll();else openModal('setup');}
 
-// Cache busting - always load fresh
-// Service Worker disabled for now - uncomment if needed
-// if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=3').then(r=>{console.log('SW registered');r.update();}).catch(e=>console.warn(e));});}
-let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;const btn=document.createElement('button');btn.className='btn-r';btn.textContent='📲 Cài App';btn.style.cssText='background:rgba(255,255,255,.25)';btn.onclick=async()=>{deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;if(outcome==='accepted')btn.remove();deferredPrompt=null;};document.querySelector('.hdr-r').prepend(btn);});
+// PWA Service Worker & Install Prompt Management
+let deferredPrompt;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js?v=4')
+      .then(r => console.log('SW registered successfully', r.scope))
+      .catch(e => console.warn('SW registration error:', e));
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('btnPwaHeader');
+  if (btn) btn.style.display = 'inline-block';
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  const btn = document.getElementById('btnPwaHeader');
+  if (btn) btn.textContent = '✅ Đã Cài App';
+  console.log('PWA installed successfully');
+});
+
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function openPwaInstallModal() {
+  const container = document.getElementById('pwaInstructions');
+  const actionBtn = document.getElementById('pwaTriggerActionBtn');
+  
+  if (deferredPrompt) {
+    container.innerHTML = `
+      <p style="margin-bottom:8px;font-weight:700;color:var(--green);">✅ Trình duyệt hỗ trợ cài đặt trực tiếp!</p>
+      <p>Bấm nút <strong>"Cài Đặt Ngay"</strong> bên dưới để thêm <strong>CRCK2 Farm2 Dashboard</strong> vào màn hình chính của bạn.</p>
+    `;
+    if (actionBtn) actionBtn.style.display = 'inline-block';
+  } else if (isIOS()) {
+    container.innerHTML = `
+      <p style="margin-bottom:8px;font-weight:700;color:#2b6cb0;">📱 Hướng dẫn dành cho iPhone / iPad (Safari):</p>
+      <ol style="padding-left:20px;margin-bottom:8px;">
+        <li>Nhấn vào biểu tượng <strong>Chia sẻ (Share)</strong> <span style="font-size:16px;">📤</span> ở thanh công cụ Safari.</li>
+        <li>Cuộn xuống và chọn <strong>"Thêm vào Màn hình chính" (Add to Home Screen)</strong> <span style="font-size:16px;">➕</span>.</li>
+        <li>Nhấn <strong>"Thêm" (Add)</strong> ở góc trên bên phải.</li>
+      </ol>
+    `;
+    if (actionBtn) actionBtn.style.display = 'none';
+  } else {
+    container.innerHTML = `
+      <p style="margin-bottom:8px;font-weight:700;color:var(--sec);">💻 Hướng dẫn cho Máy tính / Điện thoại Android:</p>
+      <ul style="padding-left:20px;margin-bottom:8px;line-height:1.7;">
+        <li><strong>Google Chrome / Edge (Máy tính):</strong> Bấm biểu tượng Cài đặt <span style="font-size:15px;">📲</span> trên thanh địa chỉ URL hoặc chọn <strong>⋮ Menu</strong> &rarr; <strong>Cài đặt CRCK2 Farm2...</strong></li>
+        <li><strong>Android (Chrome/Edge):</strong> Nhấn <strong>⋮ Menu</strong> góc trên &rarr; Chọn <strong>Cài đặt ứng dụng</strong> hoặc <strong>Thêm vào Màn hình chính</strong>.</li>
+      </ul>
+    `;
+    if (actionBtn) actionBtn.style.display = 'none';
+  }
+  openModal('pwaModal');
+}
+
+async function triggerPwaInstall() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      deferredPrompt = null;
+      closeModal('pwaModal');
+      const btn = document.getElementById('btnPwaHeader');
+      if (btn) btn.textContent = '✅ Đã Cài App';
+    }
+  }
+}
+
 init();
 </script>
 </body>
